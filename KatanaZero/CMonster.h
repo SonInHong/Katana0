@@ -33,6 +33,8 @@ public:
     bool& GetDead() { return Dead; }
     bool& GetBurn() { return Burn; }
 
+    bool PlayerDetection();
+
     friend CSword;
 
 protected:
@@ -58,6 +60,7 @@ protected:
     double DetectRange;
     double DetectAngle;
     doublepoint EyeOffset; //눈높이
+    double DetectOthersDeathRange;
 
     //피격 관련 변수들
     double HurtAngle;

@@ -3,6 +3,7 @@
 #include "TimeMgr.h"
 #include "CDoor.h"
 #include "CEventMgr.h"
+#include "CCameraMgr.h"
 
 CDoorBreaker::CDoorBreaker()
 	:Owner(nullptr)
@@ -42,6 +43,7 @@ bool CDoorBreaker::Collide(CObject* other)
 	{
 		p->SetOpen(true);
 		CEventMgr::Create()->Event_DestroyObj(this);
+		CCameraMgr::Create()->SetCameraEffect(CameraEffect::LITTLESHAKE);
 	}
 		
 	

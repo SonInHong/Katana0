@@ -217,6 +217,9 @@
     <Filter Include="Engine\CObject\CTrap\CLaser">
       <UniqueIdentifier>{1ecb705b-01c3-4a35-908a-b22ebc437c34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\CObject\CEffect\HitEffect">
+      <UniqueIdentifier>{5ceb2c2a-0514-4667-bced-b5534535f915}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -429,6 +432,9 @@
     <ClInclude Include="CLaser.h">
       <Filter>Engine\CObject\CTrap\CLaser</Filter>
     </ClInclude>
+    <ClInclude Include="CHitEffect.h">
+      <Filter>Engine\CObject\CEffect\HitEffect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KatanaZero.cpp">
@@ -628,6 +634,9 @@
     </ClCompile>
     <ClCompile Include="CLaser.cpp">
       <Filter>Engine\CObject\CTrap\CLaser</Filter>
+    </ClCompile>
+    <ClCompile Include="CHitEffect.cpp">
+      <Filter>Engine\CObject\CEffect\HitEffect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

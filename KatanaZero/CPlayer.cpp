@@ -874,7 +874,7 @@ void CPlayer::Initialize()
 	CreateRigidBody();
 
 	//CResourceMgr::Create()->MakeSpriteSheet(L"Player\\spr_idle", L"PlayerIdle");
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\right", L"IdleRight", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\right", L"IdleRight", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 11, 0.07, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\left", L"IdleLeft", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.07, true);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\right", L"IdleToRunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
@@ -1029,22 +1029,22 @@ void CPlayer::Initialize()
 
 	//ÀÜ»óÈ¿°ú
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackRight")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"AttackRight")->AfterImageOn(PenColor::SKY);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackLeft")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"AttackLeft")->AfterImageOn(PenColor::SKY);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipRight")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"FlipRight")->AfterImageOn(PenColor::SKY);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipLeft")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"FlipLeft")->AfterImageOn(PenColor::SKY);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollRight")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"RollRight")->AfterImageOn(PenColor::SKY);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollLeft")->m_StartEvent = std::bind(&CAnimator::AfterImageON, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]));
+		->FindAnimation(L"RollLeft")->AfterImageOn(PenColor::SKY);
 		
 	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateAnimation(CResourceMgr::Create()->Find<CTexture>(L"PlayerIdle"), L"Idle", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.1, true);
 
@@ -1091,19 +1091,19 @@ void CPlayer::Initialize()
 	
 	JumpCloud = new CJumpCloud;
 	JumpCloud->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloud, GROUP_TYPE::PARTICLE);
+	CEventMgr::Create()->Event_CreateObj(JumpCloud, GROUP_TYPE::FINALEFFECT);
 
 	LandCloud = new CLandCloud;
 	LandCloud->Initialize();
-	CEventMgr::Create()->Event_CreateObj(LandCloud, GROUP_TYPE::PARTICLE);
+	CEventMgr::Create()->Event_CreateObj(LandCloud, GROUP_TYPE::FINALEFFECT);
 
 	JumpCloudRight = new CJumpCloudRight;
 	JumpCloudRight->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloudRight, GROUP_TYPE::PARTICLE);
+	CEventMgr::Create()->Event_CreateObj(JumpCloudRight, GROUP_TYPE::FINALEFFECT);
 
 	JumpCloudLeft = new CJumpCloudLeft;
 	JumpCloudLeft->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloudLeft, GROUP_TYPE::PARTICLE);
+	CEventMgr::Create()->Event_CreateObj(JumpCloudLeft, GROUP_TYPE::FINALEFFECT);
 
 	// Ä®
 	PlayerSword = new CSword;
@@ -1282,7 +1282,7 @@ void CPlayer::SlashSword(double _Angle)
 	PlayerSword->SetAngle(_Angle);
 	PlayerSword->SetResize(doublepoint{ 1.5,1.5 });
 	PlayerSword->SetValid(true);
-	PlayerSword->Timer = 0.3;
+	PlayerSword->Timer = 0.2;
 
 	if (cos(_Angle) > 0)
 	{
@@ -1349,8 +1349,7 @@ void CPlayer::SlashSword(double _Angle)
 		else if (sin(_Angle) <= sin((double)90 / 180 * M_PI) && sin(_Angle) >= sin((double)85 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashRight90");
 
-		else
-			int a = 0;
+		
 	}
 		
 

@@ -33,7 +33,7 @@ void TimeMgr::Update()
 {
 	QueryPerformanceCounter(&m_CurCount);
 
-	delta_time = min(((double)m_CurCount.QuadPart - (double)m_PrevCount.QuadPart) / (double)m_Frequency.QuadPart,0.02);
+	delta_time = min(((double)m_CurCount.QuadPart - (double)m_PrevCount.QuadPart) / (double)m_Frequency.QuadPart,0.03);
 
 	m_PrevCount = m_CurCount;
 

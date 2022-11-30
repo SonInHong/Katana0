@@ -50,7 +50,7 @@ void CMap::Render(HDC _dc)
 	
 
 	//BitBlt(_dc, 0, 0, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height, Texture->GetDC(), 0, 0, SRCCOPY);
-	TransparentBlt(_dc, CameraPos.x, CameraPos.y, CameraScale.x, CameraScale.y, Texture->GetDC(), lefttop.x, lefttop.y, RealScale.x, RealScale.y, RGB(1, 1, 1));
+	TransparentBlt(_dc, (int)CameraPos.x, (int)CameraPos.y, (int)CameraScale.x, (int)CameraScale.y, Texture->GetDC(), (int)lefttop.x, (int)lefttop.y, (int)RealScale.x, (int)RealScale.y, RGB(1, 1, 1));
 		//Texture->GetWidth(), Texture->GetHeight(), RGB(1, 1, 1));
 
 	CObject::Render(_dc);

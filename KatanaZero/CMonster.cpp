@@ -37,6 +37,7 @@ CMonster::CMonster()
 	,Burn(false)
 	,Dead(false)
 	, LaserExist(false)
+	, DetectOthersDeathRange(300)
 {
 }
 
@@ -90,6 +91,40 @@ void CMonster::Update()
 		}
 	}
 
+	if (MainOrder == Main_Order::LeanLeft)
+	{
+		ActionOrder = Action_Order::LeanLeft;
+			
+		if (PlayerDetection())
+		{
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
+		}
+
+				
+	}
+
+	if (MainOrder == Main_Order::LeanRight)
+	{
+		
+		ActionOrder = Action_Order::LeanRight;
+
+		if (PlayerDetection())
+		{
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
+		}
+
+	}
+
+	if (MainOrder == Main_Order::Idle)
+	{
+		if (LookDirection == Left)
+			ActionOrder = Action_Order::IdleRight;
+
+		if (LookDirection == Right)
+			ActionOrder = Action_Order::IdleLeft;
+	}
 
 	if (MainOrder == Main_Order::RoamAround)
 	{
@@ -119,57 +154,10 @@ void CMonster::Update()
 				ActionOrder = Action_Order::WalkRight;
 		}
 
-		doublepoint eyeposition = Pos + doublepoint{ EyeOffset.x * LookDirection, EyeOffset.y }; // 플레이어 감지 로직
-
-		doublepoint playerpos[3] = { player->GetPos()             // 플레이어의 가슴과 머리 발 포지션을 불러와서
-		, player->GetPos() + doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3}
-		,player->GetPos() - doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3 } };
-
-		
-
-		for (int i = 0; i < 3; ++i)
+		if (PlayerDetection())
 		{
-			doublepoint diff = (playerpos[i] - eyeposition) * LookDirection;
-
-			if (LookDirection != 0 && diff.Norm() < DetectRange && abs(diff.Angle()) < DetectAngle) // 시야 범위 안에 있을때
-			{
-				bool check = false;
-
-				std::vector<CObject*> floors = CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::FLOOR);
-				for (int j = 0; j < floors.size(); ++j)
-				{
-					doublepoint pos = floors[j]->GetPos();
-					doublepoint scale = floors[j]->GetScale();
-
-					// 모든 구조물들 불러와서 플레이어 포즈, 아이포지션 사이의 선과 맞닿는지 테스트 한다.
-
-					CDoor* p = dynamic_cast<CDoor*>(floors[j]);
-					if (p)
-						if (p->GetOpen())
-							continue;
-
-					CStair* s = dynamic_cast<CStair*>(floors[j]);
-					if (s)
-					{
-						doublepoint A1, A2;
-						A1 = doublepoint{ pos.x - scale.x / 2, pos.y - s->GetDir() * scale.y / 2 };
-						A2 = doublepoint{ pos.x + scale.x / 2,pos.y + s->GetDir() * scale.y / 2 };
-						check = check || CollisionMath::CheckifLineCollide(A1, A2, eyeposition, playerpos[i]);
-						continue;
-					}
-
-					else
-						check = check || CollisionMath::CheckLineBoxCollision(pos, scale, eyeposition, playerpos[i]);
-				}
-
-
-				if (check == false)
-				{
-					MainOrder = Main_Order::PlayerDetected;
-					ActionOrder = Action_Order::End;
-				}
-
-			}
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
 		}
 
 	}
@@ -206,62 +194,13 @@ void CMonster::Update()
 			MoveOrder = path[1].HowToMove;
 		}
 		
-		doublepoint eyeposition = Pos + doublepoint{ EyeOffset.x * LookDirection, EyeOffset.y }; // 플레이어 감지 로직
-
-		doublepoint playerpos[3] = { player->GetPos()             // 플레이어의 가슴과 머리 발 포지션을 불러와서
-		, player->GetPos() + doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3}
-		,player->GetPos() - doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3 } };
-
-
-
-		for (int i = 0; i < 3; ++i)
+		if (PlayerDetection())
 		{
-			doublepoint diff = (playerpos[i] - eyeposition) * LookDirection;
-
-			if (LookDirection != 0 && diff.Norm() < DetectRange && abs(diff.Angle()) < DetectAngle) // 시야 범위 안에 있을때
-			{
-				bool check = false;
-
-				std::vector<CObject*> floors = CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::FLOOR);
-				for (int j = 0; j < floors.size(); ++j)
-				{
-					doublepoint pos = floors[j]->GetPos();
-					doublepoint scale = floors[j]->GetScale();
-
-					// 모든 구조물들 불러와서 플레이어 포즈, 아이포지션 사이의 선과 맞닿는지 테스트 한다.
-
-					CDoor* p = dynamic_cast<CDoor*>(floors[j]);
-					if (p)
-						if (p->GetOpen())
-							continue;
-
-					CStair* s = dynamic_cast<CStair*>(floors[j]);
-					if (s)
-					{
-						doublepoint A1, A2;
-						A1 = doublepoint{ pos.x - scale.x / 2, pos.y - s->GetDir() * scale.y / 2 };
-						A2 = doublepoint{ pos.x + scale.x / 2,pos.y + s->GetDir() * scale.y / 2 };
-						check = check || CollisionMath::CheckifLineCollide(A1, A2, eyeposition, playerpos[i]);
-						continue;
-					}
-					
-					else
-						check = check || CollisionMath::CheckLineBoxCollision(pos, scale, eyeposition, playerpos[i]);
-				}
-
-
-				if (check == false)
-				{
-					MainOrder = Main_Order::PlayerDetected;
-					ActionOrder = Action_Order::End;
-				}
-
-			}
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
 		}
 		
 		
-		
-
 		
 	}
 	
@@ -400,6 +339,80 @@ void CMonster::SetBloodEmitormaxOption(int maxcount, doublepoint resize, doublep
 {
 	BloodEmitor->SetOption(maxcount,resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
 	BloodEmitor->SetOnOff(true);
+}
+
+bool CMonster::PlayerDetection()
+{
+	// 플레이어 감지 로직
+	CPlayer* player = dynamic_cast<CPlayer*>(CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::PLAYER)[0]);
+
+	doublepoint eyeposition = Pos + doublepoint{ EyeOffset.x * LookDirection, EyeOffset.y };
+
+	doublepoint playerpos[3] = { player->GetPos()             // 플레이어의 가슴과 머리 발 포지션을 불러와서
+	, player->GetPos() + doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3}
+	,player->GetPos() - doublepoint{ 0,player->GetScale().y * player->GetResize().y / 3 } };
+
+
+
+	for (int i = 0; i < 3; ++i)
+	{
+		doublepoint diff = (playerpos[i] - eyeposition) * LookDirection;
+
+		if (LookDirection != 0 && diff.Norm() < DetectRange && abs(diff.Angle()) < DetectAngle) // 시야 범위 안에 있을때
+		{
+			bool check = false;
+
+			std::vector<CObject*> floors = CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::FLOOR);
+			for (int j = 0; j < floors.size(); ++j)
+			{
+				doublepoint pos = floors[j]->GetPos();
+				doublepoint scale = floors[j]->GetScale();
+
+				// 모든 구조물들 불러와서 플레이어 포즈, 아이포지션 사이의 선과 맞닿는지 테스트 한다.
+
+				CDoor* p = dynamic_cast<CDoor*>(floors[j]);
+				if (p)
+					if (p->GetOpen())
+						continue;
+
+				CStair* s = dynamic_cast<CStair*>(floors[j]);
+				if (s)
+				{
+					doublepoint A1, A2;
+					A1 = doublepoint{ pos.x - scale.x / 2, pos.y - s->GetDir() * scale.y / 2 };
+					A2 = doublepoint{ pos.x + scale.x / 2,pos.y + s->GetDir() * scale.y / 2 };
+					check = check || CollisionMath::CheckifLineCollide(A1, A2, eyeposition, playerpos[i]);
+					continue;
+				}
+
+				else
+					check = check || CollisionMath::CheckLineBoxCollision(pos, scale, eyeposition, playerpos[i]);
+			}
+
+
+			if (check == false)
+			{
+				return true;
+			}
+
+		}
+	}
+
+	// 다른 몬스터의 죽음을 인지한다.
+
+	std::vector<CObject*> monsters = CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::MONSTER);
+	for (int i = 0; i < monsters.size(); ++i)
+	{
+		CMonster* p = dynamic_cast<CMonster*>(monsters[i]);
+
+		if (p)
+		{
+			if (p->Dead && abs(p->GetPos().x-Pos.x) < DetectOthersDeathRange && abs(p->GetPos().y-Pos.y) < 100)
+				return true;
+		}
+	}
+
+	return false;
 }
 
 void CMonster::MoveLeft()

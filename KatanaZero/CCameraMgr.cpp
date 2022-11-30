@@ -4,15 +4,23 @@
 #include "KeyMgr.h"
 #include "TimeMgr.h"
 #include "PenMgr.h"
+#include "CPlayer.h"
+#include "CSceneMgr.h"
+#include "CScene.h"
 
 CCameraMgr::CCameraMgr()
     :LeftTop{}
     , Scale{}
-    ,effect(CameraEffect::End)
-    ,Timer(0)
-    ,OffSet{}
-    ,MarkPoint{}
-    ,shaker(0)
+    , effect(CameraEffect::End)
+    , Timer(0)
+    , OffSet{}
+    , MarkPoint{}
+    , shaker(0)
+    , mode(CameraMode::DontMove)
+    , LeftLimit(-10000)
+    ,RightLimit(10000)
+    ,UpperLimit(-10000)
+    ,BottomLimit(10000)
 {
 }
 
@@ -22,8 +30,8 @@ CCameraMgr::~CCameraMgr()
 
 doublepoint CCameraMgr::RealCoordinate(doublepoint CameraPos)
 {
-    int height = CCore::Create()->GetWindowData().height;
-    int width = CCore::Create()->GetWindowData().width;
+    double height = (double)CCore::Create()->GetWindowData().height;
+    double width = (double)CCore::Create()->GetWindowData().width;
 
     doublepoint y;
 
@@ -35,8 +43,8 @@ doublepoint CCameraMgr::RealCoordinate(doublepoint CameraPos)
 
 doublepoint CCameraMgr::CameraCoordinate(doublepoint AbsPos)
 {
-    int height = CCore::Create()->GetWindowData().height;
-    int width = CCore::Create()->GetWindowData().width;
+    double height = (double)CCore::Create()->GetWindowData().height;
+    double width = (double)CCore::Create()->GetWindowData().width;
 
     doublepoint y;
 
@@ -48,8 +56,8 @@ doublepoint CCameraMgr::CameraCoordinate(doublepoint AbsPos)
 
 doublepoint CCameraMgr::CameraScale(doublepoint AbsScale)
 {
-    int height = CCore::Create()->GetWindowData().height;
-    int width = CCore::Create()->GetWindowData().width;
+    double height = (double)CCore::Create()->GetWindowData().height;
+    double width = (double)CCore::Create()->GetWindowData().width;
 
     doublepoint y;
 
@@ -61,8 +69,8 @@ doublepoint CCameraMgr::CameraScale(doublepoint AbsScale)
 
 doublepoint CCameraMgr::RealScale(doublepoint CameraScale)
 {
-    int height = CCore::Create()->GetWindowData().height;
-    int width = CCore::Create()->GetWindowData().width;
+    double height = (double)CCore::Create()->GetWindowData().height;
+    double width = (double)CCore::Create()->GetWindowData().width;
 
     doublepoint y;
 
@@ -72,7 +80,7 @@ doublepoint CCameraMgr::RealScale(doublepoint CameraScale)
     return y;
 }
 
-#define alpha 0.7
+#define alpha 0.8
 
 void CCameraMgr::Reset()
 {
@@ -122,12 +130,78 @@ void CCameraMgr::Update()
 
         Timer += TimeMgr::Create()->dt();
 
-        OffSet = doublepoint {20* shaker *cos(70* shaker),20* shaker *sin(70* shaker)};
+        OffSet = doublepoint {30* shaker *cos(100* shaker),30* shaker *sin(100* shaker)};
+
+    }
+    break;
+
+    case CameraEffect::LITTLESHAKE:
+    {
+        if (Timer > 0.1)
+        {
+            shaker -= TimeMgr::Create()->dt();
+        }
+
+        else if (Timer <= 0.1)
+        {
+            shaker += TimeMgr::Create()->dt();
+        }
+
+        if (Timer > 0.2)
+        {
+            effect = CameraEffect::End;
+            Timer = 0;
+            shaker = 0;
+            OffSet = doublepoint{};
+        }
+
+        Timer += TimeMgr::Create()->dt();
+
+        OffSet = doublepoint{ 20 * shaker * cos(70 * shaker),20 * shaker * sin(70 * shaker) };
 
     }
     break;
 
     }
+
+
+
+
+    //=========================================================================================================
+    switch (mode)
+    {
+    case CameraMode::FollowPlayer:
+    {
+        CPlayer* player = dynamic_cast<CPlayer*>(CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::PLAYER)[0]);
+
+        if (player)
+        {
+            doublepoint PlcameraPos = CameraCoordinate(player->GetPos());
+            doublepoint Center = doublepoint{ (double)CCore::Create()->GetWindowData().width / 2, (double)CCore::Create()->GetWindowData().height / 2 };
+
+            if((PlcameraPos - Center).Norm()>30)
+                MarkPoint = MarkPoint + (PlcameraPos - Center) * 3 * TimeMgr::Create()->dt();
+        }
+
+    }
+    break;
+
+    }
+
+    //=========================================================================================================
+
+
+    if (MarkPoint.x < LeftLimit)
+        MarkPoint.x = LeftLimit;
+
+    if (MarkPoint.x + Scale.x > RightLimit)
+        MarkPoint.x = RightLimit-Scale.x;
+
+    if (MarkPoint.y < UpperLimit)
+        MarkPoint.y = UpperLimit;
+
+    if (MarkPoint.y + Scale.y > BottomLimit)
+        MarkPoint.y = BottomLimit - Scale.y;
 
     LeftTop = MarkPoint + OffSet;
     
@@ -182,6 +256,6 @@ void CCameraMgr::Initialize()
     comBitmap = CreateCompatibleBitmap(CCore::Create()->GetToolWindowData().hdc, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
     HBITMAP temp = (HBITMAP)SelectObject(comDC, comBitmap);
     DeleteObject(temp);
-    SelectObject(comDC, PenMgr::Create()->GetMagentaBrush());
+    SelectObject(comDC, PenMgr::Create()->GetSkyBrush());
 
 }

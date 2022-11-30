@@ -75,7 +75,7 @@ enum class GROUP_TYPE
 	MONSTER_PROJECTILE,
 	PLAYER_PROJECTILE,
 	CENSOR,
-
+	FINALEFFECT,
 	UI = 30,
 	CURSOR = 31,
 	END = 32,
@@ -118,6 +118,9 @@ enum class ANIMATOR_TYPE
 
 enum class Main_Order
 {
+	LeanLeft,
+	LeanRight,
+	Idle,
 	RoamAround,
 	GetToRoamingPoint,
 	PlayerDetected,
@@ -144,7 +147,9 @@ enum class Move_Order
 };
 
 enum class Action_Order
-{
+{ 
+	LeanLeft,
+	LeanRight,
 	IdleLeft,
 	IdleRight,
 	TurnLeft,
@@ -160,10 +165,24 @@ enum class Action_Order
 	End,
 };
 
+enum class CameraMode
+{
+	DontMove,
+	FollowPlayer,
+};
+
 enum class CameraEffect
 {
+	LITTLESHAKE,
 	SHAKE,
 	End,
+};
+
+enum class PenColor
+{
+	MAGENTA,
+	YELLOW,
+	SKY,
 };
 
 union CollisionID

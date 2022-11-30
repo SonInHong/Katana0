@@ -174,12 +174,12 @@ void CAnimator::Reset()
 
 void CAnimator::AfterImageON()
 {
-	 m_pCurAnim->AfterImageOn();
+	 //m_pCurAnim->AfterImageOn();
 }
 
 void CAnimator::AfterImageOff()
 {
-	m_pCurAnim->AfterImageOff();
+	//m_pCurAnim->AfterImageOff();
 }
 
 void CAnimator::BurnAnimation()

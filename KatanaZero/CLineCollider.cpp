@@ -52,7 +52,7 @@ void CLineCollider::Render(HDC _dc)
 
 		HBRUSH oldBrush = (HBRUSH)SelectObject(_dc, GetStockObject(NULL_BRUSH));
 
-		if (!KeyMgr::Create()->key(Key::L).pressed)
+		if (!KeyMgr::Create()->key(Key::C).pressed)
 		{
 			MoveToEx(_dc, CA.x, CA.y, NULL);
 			LineTo(_dc, CB.x, CB.y);

@@ -28,6 +28,8 @@ public:
 	HDC GetcomDC() { return comDC; }
 
 	void SetCameraEffect(CameraEffect p) { effect = p; }
+	void SetCameraMode(CameraMode p) { mode = p; }
+	void SetCameraLimit(double left, double right, double upper, double bottom) { LeftLimit = left; RightLimit = right; UpperLimit = upper; BottomLimit = bottom; }
 
 private:
 	doublepoint LeftTop;
@@ -46,6 +48,13 @@ private:
 	double shaker;
 	doublepoint OffSet;
 	doublepoint MarkPoint;
+
+	double LeftLimit;
+	double RightLimit;
+	double UpperLimit;
+	double BottomLimit;
+
+	CameraMode mode;
 
 };
 

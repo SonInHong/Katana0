@@ -73,10 +73,11 @@ void CScene_Start::Enter()
 	//Monster 추가
 	
 	CGrunt* _pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ 600,200 });
+	_pMon->SetPos(doublepoint{ 400,200 });
 	_pMon->SetScale(doublepoint{15,30});
 	_pMon->SetResize(doublepoint{ 2,2 });
 	_pMon->SetRoamingPoint(doublepoint{ 600,200 });
+	_pMon->SetMainOrder(Main_Order::LeanLeft);
 	AddObject(_pMon, GROUP_TYPE::MONSTER);
 	
 	_pMon = new CGrunt;
@@ -93,12 +94,7 @@ void CScene_Start::Enter()
 	_pMon->SetRoamingPoint(doublepoint{ 300,500 });
 	AddObject(_pMon, GROUP_TYPE::MONSTER);
 
-	_pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ 600,400 });
-	_pMon->SetScale(doublepoint{ 15,30 });
-	_pMon->SetResize(doublepoint{ 2,2 });
-	_pMon->SetRoamingPoint(doublepoint{ 300,500 });
-	AddObject(_pMon, GROUP_TYPE::MONSTER);
+	
 
 	/*
 	*/
@@ -265,6 +261,10 @@ void CScene_Start::Enter()
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER, GROUP_TYPE::MONSTER_PROJECTILE);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::MONSTER, GROUP_TYPE::TRAP);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER, GROUP_TYPE::TRAP);
+
+	//카메라 모드 지정
+	CCameraMgr::Create()->SetCameraMode(CameraMode::FollowPlayer);
+	//CCameraMgr::Create()->SetCameraLimit(-200, 1500, -100, 700);
 }
 
 void CScene_Start::Exit()

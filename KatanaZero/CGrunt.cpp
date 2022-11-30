@@ -56,6 +56,9 @@ void CGrunt::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\right", L"GruntFallRight", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\left", L"GruntFallLeft", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\right", L"GruntLeanRight", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true , doublepoint{5,0});
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\left", L"GruntLeanLeft", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true, doublepoint{ -5,0 });
+
 	//==============================================================================================================================================================
 	//이벤트 지정
 	//==============================================================================================================================================================
@@ -114,7 +117,16 @@ void CGrunt::Initialize()
 
 	
 
-	//==========================================================================================================================
+	//=====================================================================================================================
+	//잔상효과
+	//=====================================================================================================================
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"GruntHurtflyRight")->AfterImageOn(0.2 , PenColor::MAGENTA);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"GruntHurtflyLeft")->AfterImageOn(0.2, PenColor::MAGENTA);
+
+	//=====================================================================================================================
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntIdleRight");
 	LookDirection = Right;
 
@@ -526,6 +538,22 @@ void CGrunt::Update()
 	case Action_Order::End:
 	{
 
+	}
+	break;
+
+	case Action_Order::LeanLeft:
+	{
+		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntLeanLeft");
+		velocity.x = 0;
+		LookDirection = Right;
+	}
+	break;
+
+	case Action_Order::LeanRight:
+	{
+		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntLeanRight");
+		velocity.x = 0;
+		LookDirection = Left;
 	}
 	break;
 

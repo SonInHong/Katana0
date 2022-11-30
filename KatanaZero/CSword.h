@@ -3,6 +3,7 @@
 #include "CTexture.h"
 #include "CPlayer.h"
 #include "define.h"
+#include "CHitEffect.h"
 
 class CSword :
     public CObject
@@ -16,7 +17,7 @@ public:
     virtual void Render(HDC _dc);
 
     virtual bool Collide(CObject* other);
-
+    virtual bool Colliding(CObject* other);
     void SetAngle(double a) { Angle = a; }
 
  
@@ -34,6 +35,9 @@ private:
 
     double Angle;
     double Timer;
+    double Length;
+
+    CHitEffect* hiteffect;
 
     friend CPlayer;
 };

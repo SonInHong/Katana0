@@ -25,6 +25,9 @@ CAnimation::CAnimation()
 	,BurnIndex(0)
 	,Burn(false)
 	,Burn_Yalpha(0)
+	, Aftert(0)
+	, AfterTimeLimit(0)
+	, AfterTimerOnOff(false)
 {
 }
 
@@ -35,11 +38,17 @@ CAnimation::~CAnimation()
 void CAnimation::Update()
 {
 	Timer += TimeMgr::Create()->dt();
+	Aftert += TimeMgr::Create()->dt(); // 잔상효과 타이머
 
 	if (m_Start == true)
 	{
 		m_StartEvent();
 		m_Start = false;
+
+		if (AfterTimerOnOff) // 잔상효과 타이머
+		{
+			Aftert = 0;
+		}
 	}
 
 	if (Burn)
@@ -49,6 +58,8 @@ void CAnimation::Update()
 
 		return;
 	}
+
+	
 
 	if (Timer >= m_FrameTime)
 	{
@@ -103,6 +114,13 @@ void CAnimation::Render(HDC _dc)
 		Scale = CCameraMgr::Create()->CameraScale(Scale);
 	}
 
+	BLENDFUNCTION func0 = {};
+	func0.AlphaFormat = AC_SRC_ALPHA;
+	func0.BlendFlags = 0;
+	func0.BlendOp = AC_SRC_OVER;
+	func0.AlphaFormat = AC_SRC_ALPHA;
+	func0.SourceConstantAlpha = 255;
+
 	BLENDFUNCTION func = {};
 	func.AlphaFormat = AC_SRC_ALPHA;
 	func.BlendFlags = 0;
@@ -148,24 +166,35 @@ void CAnimation::Render(HDC _dc)
 		TransparentBlt(_dc, Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2, Pos.y - AnimationScaling.y * Resize.y * Scale.y / 2, AnimationScaling.x * Resize.x * Scale.x, AnimationScaling.y * Resize.y * Scale.y
 			, com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y, RGB(255,212,0));
 
-		SelectObject(com_DC, PenMgr::Create()->GetMagentaBrush());
+		SelectObject(com_DC, PenMgr::Create()->GetSkyBrush());
 
 		return;
 
 	}
 
 
-	TransparentBlt(_dc, Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2 , Pos.y - AnimationScaling.y * Resize.y*Scale.y / 2, AnimationScaling.x* Resize.x*Scale.x, AnimationScaling.y * Resize.y*Scale.y
-		, m_Texture->GetDC(), m_LeftTop.x + m_SpriteSize.x * m_CurIndex, m_LeftTop.y, m_SpriteSize.x, m_SpriteSize.y, RGB(255, 255, 255));
+	TransparentBlt(_dc, (int)Pos.x - (int)AnimationScaling.x * (int)Resize.x * (int)Scale.x / 2 , (int)Pos.y - (int)AnimationScaling.y * (int)Resize.y* (int)Scale.y / 2
+		, (int)AnimationScaling.x* (int)Resize.x* (int)Scale.x, (int)AnimationScaling.y * (int)Resize.y* (int)Scale.y
+		, m_Texture->GetDC(), m_LeftTop.x + m_SpriteSize.x * m_CurIndex, m_LeftTop.y, m_SpriteSize.x, m_SpriteSize.y, RGB(255,255,255));
 
 	if (AfterImageOnOff == true)
 	{
-		HDC com_DC = CCameraMgr::Create()->GetcomDC();
+		if (AfterTimerOnOff && Aftert > AfterTimeLimit)
+			return;
 
-		for (int i = 0; i < AfterImage.size(); ++i)
+		HBRUSH brush = PenMgr::Create()->GetBrush(AfterColor);
+		HDC com_DC = CCameraMgr::Create()->GetcomDC();
+		HBRUSH oldbrush = (HBRUSH)SelectObject(com_DC, brush);
+
+		for (int i = AfterImage.size()-1; i >=0; --i)
 		{
-			doublepoint pos = AfterImage[i].Pos;
-			doublepoint size = AfterImage[i].Size;
+			if ((AfterImage[i].Pos - (m_Owner->GetOwner()->GetPos() + OffSet)).Norm() > 70)
+				break;
+
+			doublepoint pos = CCameraMgr::Create()->CameraCoordinate(AfterImage[i].Pos);
+			doublepoint size = CCameraMgr::Create()->CameraScale(AfterImage[i].Size);
+			size.x = size.x * Resize.x * AnimationScaling.x;
+			size.y = size.y * Resize.y * AnimationScaling.y;
 			int index = AfterImage[i].Index;
 
 			Rectangle(com_DC, -1, -1, m_SpriteSize.x + 1, m_SpriteSize.y + 1);
@@ -178,9 +207,11 @@ void CAnimation::Render(HDC _dc)
 			
 		}
 
-		ImageSave IS = { m_CurIndex, doublepoint{Pos.x,Pos.y},doublepoint{AnimationScaling.x * Resize.x * Scale.x, AnimationScaling.y * Resize.y * Scale.y} };
+		ImageSave IS = { m_CurIndex, m_Owner->GetOwner()->GetPos() + OffSet, doublepoint{ (double)m_SpriteSize.x, (double)m_SpriteSize.y } };
 		AfterImage.push_back(IS);
 
+
+		SelectObject(com_DC, oldbrush);
 	}
 }
 
@@ -191,6 +222,6 @@ void CAnimation::Reset()
 	m_CurIndex = 0;
 	
 	AfterImage.clear();
-	AfterImageOnOff = false;
+	//AfterImageOnOff = false;
 
 }

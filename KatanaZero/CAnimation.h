@@ -48,6 +48,24 @@ public:
 		
 	}
 
+	void AfterImageOn( PenColor c)
+	{
+		AfterImage.clear();
+		AfterImageOnOff = true;
+		AfterColor = c;
+
+	}
+
+	void AfterImageOn(double timelimit , PenColor c)
+	{
+		AfterImage.clear();
+		AfterImageOnOff = true;
+
+		AfterTimeLimit = timelimit;
+		AfterTimerOnOff = true;
+		AfterColor = c;
+	}
+
 	void Reset();
 	int& GetCurIndex() { return m_CurIndex; }
 	
@@ -79,12 +97,7 @@ private:
 	std::vector<ImageSave> AfterImage;
 	CTexture* AfterTexture;
 
-	void AfterImageOn() 
-	{ 
-		AfterImage.clear();
-		AfterImageOnOff = true; 
-		
-	}
+	
 
 
 	void AfterImageOff() { AfterImageOnOff = false; AfterImage.clear(); }
@@ -95,6 +108,11 @@ private:
 
 public:
 	Event m_StartEvent, m_EndEvent, m_CompleteEvent;
+
+	double Aftert;
+	double AfterTimeLimit;
+	bool AfterTimerOnOff;
+	PenColor AfterColor;
 
 
 };
