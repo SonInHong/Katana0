@@ -20,6 +20,7 @@ public:
 	void SetCenter(doublepoint _c) { LeftTop.x = _c.x - Scale.x / 2; LeftTop.y = _c.y - Scale.y / 2; }
 	void Reset();
 	void Update();
+	void LateUpdate();
 	void MoveCamera();
 
 	void Initialize();
@@ -55,6 +56,8 @@ private:
 	double BottomLimit;
 
 	CameraMode mode;
+
+	double frametime;
 
 };
 

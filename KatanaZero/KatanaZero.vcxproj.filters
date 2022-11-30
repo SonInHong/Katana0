@@ -100,9 +100,6 @@
     <Filter Include="Engine\Managers\CUIMgr">
       <UniqueIdentifier>{132ddbaf-4a7e-4bdc-9603-0d1df856ff9b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\CMap">
-      <UniqueIdentifier>{950f1b95-f8e6-4eac-811b-765f60241880}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\CObject\CTile">
       <UniqueIdentifier>{55e70a2d-e0b0-45a2-820d-a3e9f038bc52}</UniqueIdentifier>
     </Filter>
@@ -219,6 +216,9 @@
     </Filter>
     <Filter Include="Engine\CObject\CEffect\HitEffect">
       <UniqueIdentifier>{5ceb2c2a-0514-4667-bced-b5534535f915}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CMonster\CPomp">
+      <UniqueIdentifier>{8df56f2d-3a90-4ff6-8004-4b2defe15c4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -435,6 +435,9 @@
     <ClInclude Include="CHitEffect.h">
       <Filter>Engine\CObject\CEffect\HitEffect</Filter>
     </ClInclude>
+    <ClInclude Include="CPomp.h">
+      <Filter>Engine\CObject\CMonster\CPomp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KatanaZero.cpp">
@@ -637,6 +640,9 @@
     </ClCompile>
     <ClCompile Include="CHitEffect.cpp">
       <Filter>Engine\CObject\CEffect\HitEffect</Filter>
+    </ClCompile>
+    <ClCompile Include="CPomp.cpp">
+      <Filter>Engine\CObject\CMonster\CPomp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

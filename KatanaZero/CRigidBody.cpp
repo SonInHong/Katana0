@@ -9,10 +9,10 @@
 
 CRigidBody::CRigidBody()
 	:m_Mass(50)
-	,m_MaxSpeed(10000)
-	,m_MaxXspeed(400)
-	,m_MaxXFallspeed(250)
-	,m_MaxXWalkspeed(150)
+	,m_MaxSpeed(scaleA*10000)
+	,m_MaxXspeed(scaleA * 400)
+	,m_MaxXFallspeed(scaleA * 250)
+	,m_MaxXWalkspeed(scaleA * 150)
 	,m_Friction(0)
 	,m_PrevPos{}
 	,m_Force{}
@@ -22,9 +22,9 @@ CRigidBody::CRigidBody()
 	,m_OnGround(false)
 	,m_OnStair(0)
 	,m_GivenAccel{}
-	,m_DragCoff(0.1)
+	,m_DragCoff(scaleA * 0.1)
 	,m_StopFricCff(10)
-	,m_MoveFricCff(1500)
+	,m_MoveFricCff(scaleA * 1500)
 	,m_Area(1)
 	,m_WallGrab(0)
 	,m_Roll(0)
@@ -47,7 +47,7 @@ void CRigidBody::Initialize(CObject* p)
 	m_PrevPos = p->GetPos();
 }
 
-#define Gravity_Accelaration 1500;
+#define Gravity_Accelaration scaleA*1500;
 
 void CRigidBody::Update()
 {
@@ -81,9 +81,9 @@ void CRigidBody::Update()
 	if (m_WallGrab != 0)
 	{
 		if (m_Velocity.y < 0)
-			m_Force.y -= 40000;
+			m_Force.y -= scaleA * 40000;
 		else
-			m_Force.y -= 65000;
+			m_Force.y -= scaleA * 65000;
 	}
 
 		
@@ -132,10 +132,10 @@ void CRigidBody::Update()
 	
 
 	if (m_Roll == 1) // 구르기
-		m_Velocity.x = 500;
+		m_Velocity.x = scaleA * 500;
 
 	if(m_Roll == -1)
-		m_Velocity.x = -500;
+		m_Velocity.x = -scaleA * 500;
 
 	// y방향 속도 계산
 	//if ( m_OnGround||m_OnStair)
@@ -152,14 +152,14 @@ void CRigidBody::Update()
 	
 		if (m_Flip == 1)
 		{
-			m_Velocity.x = 500;
-			m_Velocity.y = -250;
+			m_Velocity.x = scaleA * 500;
+			m_Velocity.y = -scaleA * 250;
 		}
 
 		if (m_Flip == -1)
 		{
-			m_Velocity.x = -500;
-			m_Velocity.y = -250;
+			m_Velocity.x = -scaleA * 500;
+			m_Velocity.y = -scaleA * 250;
 		}
 
 	doublepoint m_NextPos;

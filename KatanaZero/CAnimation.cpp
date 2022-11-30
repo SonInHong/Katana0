@@ -173,8 +173,8 @@ void CAnimation::Render(HDC _dc)
 	}
 
 
-	TransparentBlt(_dc, (int)Pos.x - (int)AnimationScaling.x * (int)Resize.x * (int)Scale.x / 2 , (int)Pos.y - (int)AnimationScaling.y * (int)Resize.y* (int)Scale.y / 2
-		, (int)AnimationScaling.x* (int)Resize.x* (int)Scale.x, (int)AnimationScaling.y * (int)Resize.y* (int)Scale.y
+	TransparentBlt(_dc, (int)(Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2) , (int)(Pos.y - AnimationScaling.y * Resize.y* Scale.y / 2)
+		, (int)(AnimationScaling.x* Resize.x* Scale.x), (int)(AnimationScaling.y * Resize.y* Scale.y)
 		, m_Texture->GetDC(), m_LeftTop.x + m_SpriteSize.x * m_CurIndex, m_LeftTop.y, m_SpriteSize.x, m_SpriteSize.y, RGB(255,255,255));
 
 	if (AfterImageOnOff == true)

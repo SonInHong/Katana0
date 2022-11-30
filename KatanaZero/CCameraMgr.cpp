@@ -21,6 +21,7 @@ CCameraMgr::CCameraMgr()
     ,RightLimit(10000)
     ,UpperLimit(-10000)
     ,BottomLimit(10000)
+    ,frametime(0)
 {
 }
 
@@ -48,8 +49,8 @@ doublepoint CCameraMgr::CameraCoordinate(doublepoint AbsPos)
 
     doublepoint y;
 
-    y.x = (AbsPos.x - LeftTop.x) * (width / Scale.x);
-    y.y = (AbsPos.y - LeftTop.y) * (height / Scale.y);
+    y.x = floor((AbsPos.x - LeftTop.x) * (width / Scale.x));
+        y.y = floor((AbsPos.y - LeftTop.y) * (height / Scale.y)); 
 
     return y;
 }
@@ -61,8 +62,8 @@ doublepoint CCameraMgr::CameraScale(doublepoint AbsScale)
 
     doublepoint y;
 
-    y.x = AbsScale.x * (width / Scale.x);
-    y.y = AbsScale.y * (height / Scale.y);
+    y.x = floor( AbsScale.x* (width / Scale.x));
+    y.y = floor(AbsScale.y * (height / Scale.y));
 
     return y;
 }
@@ -80,7 +81,7 @@ doublepoint CCameraMgr::RealScale(doublepoint CameraScale)
     return y;
 }
 
-#define alpha 0.8
+#define alpha 1
 
 void CCameraMgr::Reset()
 {
@@ -95,14 +96,20 @@ void CCameraMgr::Reset()
 
     Timer = 0;
 
-    Scale.y = alpha * CCore::Create()->GetWindowData().height;
-    Scale.x = alpha * CCore::Create()->GetWindowData().width;
+    Scale.y = floor(alpha * CCore::Create()->GetWindowData().height);
+    Scale.x = floor(alpha * CCore::Create()->GetWindowData().width);
 }
 
 void CCameraMgr::Update()
 {
     MoveCamera();
 
+    
+    
+}
+
+void CCameraMgr::LateUpdate()
+{
     switch (effect)
     {
     case CameraEffect::End:
@@ -130,7 +137,7 @@ void CCameraMgr::Update()
 
         Timer += TimeMgr::Create()->dt();
 
-        OffSet = doublepoint {30* shaker *cos(100* shaker),30* shaker *sin(100* shaker)};
+        OffSet = doublepoint{ 30 * shaker * cos(100 * shaker),30 * shaker * sin(100 * shaker) };
 
     }
     break;
@@ -179,7 +186,7 @@ void CCameraMgr::Update()
             doublepoint PlcameraPos = CameraCoordinate(player->GetPos());
             doublepoint Center = doublepoint{ (double)CCore::Create()->GetWindowData().width / 2, (double)CCore::Create()->GetWindowData().height / 2 };
 
-            if((PlcameraPos - Center).Norm()>30)
+            if ((PlcameraPos - Center).Norm() > 10)
                 MarkPoint = MarkPoint + (PlcameraPos - Center) * 3 * TimeMgr::Create()->dt();
         }
 
@@ -195,7 +202,7 @@ void CCameraMgr::Update()
         MarkPoint.x = LeftLimit;
 
     if (MarkPoint.x + Scale.x > RightLimit)
-        MarkPoint.x = RightLimit-Scale.x;
+        MarkPoint.x = RightLimit - Scale.x;
 
     if (MarkPoint.y < UpperLimit)
         MarkPoint.y = UpperLimit;
@@ -203,7 +210,11 @@ void CCameraMgr::Update()
     if (MarkPoint.y + Scale.y > BottomLimit)
         MarkPoint.y = BottomLimit - Scale.y;
 
-    LeftTop = MarkPoint + OffSet;
+
+
+
+    LeftTop.x = floor(MarkPoint.x + OffSet.x);
+    LeftTop.y = floor(MarkPoint.y + OffSet.y);
     
 }
 

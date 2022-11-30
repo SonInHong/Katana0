@@ -5,9 +5,9 @@
 CNormalDoorLeft::CNormalDoorLeft()
 {
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Normal_Door\\Idle\\left", L"NormalLeftDoorIdle", doublepoint{ 0,0 }, doublepoint{ 80,64 }, 1, 0.04, true
-		, doublepoint{ -30,0 });
+		, doublepoint{ -scaleA * 30,0 });
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Normal_Door\\Open\\left", L"NormalLeftDoorOpen", doublepoint{ 0,0 }, doublepoint{ 80,64 }, 16, 0.04, false
-		, doublepoint{ -30,0 });
+		, doublepoint{ -scaleA * 30,0 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"NormalLeftDoorIdle");
 }

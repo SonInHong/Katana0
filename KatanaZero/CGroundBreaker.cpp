@@ -8,7 +8,7 @@
 
 CGroundBreaker::CGroundBreaker()
 	:Owner(nullptr)
-	,Speed(600)
+	,Speed(scaleA * 600)
 	,OffSet{}
 {
 }
@@ -41,8 +41,8 @@ void CGroundBreaker::Initialize()
 
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
-	Scale.x = 30;
-	Scale.y = 30;
+	Scale.x = scaleA * 30;
+	Scale.y = scaleA * 30;
 
 }
 

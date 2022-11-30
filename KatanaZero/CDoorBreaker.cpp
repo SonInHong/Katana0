@@ -7,7 +7,7 @@
 
 CDoorBreaker::CDoorBreaker()
 	:Owner(nullptr)
-	, Speed(100)
+	, Speed(scaleA * 100)
 	, OffSet{}
 	, dir(0)
 {
@@ -23,8 +23,8 @@ void CDoorBreaker::Initialize()
 
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
-	Scale.x = 30;
-	Scale.y = 30;
+	Scale.x = scaleA * 30;
+	Scale.y = scaleA * 30;
 }
 
 void CDoorBreaker::Update()

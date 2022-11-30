@@ -56,8 +56,8 @@ void CGrunt::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\right", L"GruntFallRight", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\left", L"GruntFallLeft", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\right", L"GruntLeanRight", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true , doublepoint{5,0});
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\left", L"GruntLeanLeft", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true, doublepoint{ -5,0 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\right", L"GruntLeanRight", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true , doublepoint{ scaleA * 5,0});
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\left", L"GruntLeanLeft", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true, doublepoint{ -scaleA * 5,0 });
 
 	//==============================================================================================================================================================
 	//이벤트 지정
@@ -82,10 +82,10 @@ void CGrunt::Initialize()
 		->FindAnimation(L"GruntTurnLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"GruntIdleLeft");
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GruntAttackRight")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Right);
+		->FindAnimation(L"GruntAttackRight")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Right);  // 공격
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GruntAttackLeft")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Left);
+		->FindAnimation(L"GruntAttackLeft")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Left); // 공격
 
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
@@ -101,19 +101,19 @@ void CGrunt::Initialize()
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GruntHurtflyRight")->m_StartEvent = std::bind(&CMonster::SetBloodEmitorOption, this
-			, doublepoint{ 1,1 }, doublepoint{ 100,300 }, doublepoint{ 100,150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -5,5 }, doublepoint{ -5,5 });
+			, doublepoint{ scaleA * 1,scaleA * 1 }, doublepoint{ 100,300 }, doublepoint{ scaleA * 100,scaleA * 150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -scaleA * 5,scaleA * 5 }, doublepoint{ -scaleA * 5,scaleA * 5 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GruntHurtflyLeft")->m_StartEvent = std::bind(&CMonster::SetBloodEmitorOption, this
-			, doublepoint{ 1,1 }, doublepoint{ 270,470 }, doublepoint{ 50,70 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -5,5 }, doublepoint{ -5,5 });
+			, doublepoint{ scaleA * 1,scaleA * 1 }, doublepoint{ 270,470 }, doublepoint{ scaleA * 50,scaleA * 70 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -scaleA * 5,scaleA * 5 }, doublepoint{ -scaleA * 5,scaleA * 5 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GruntHurtgroundRight")->m_StartEvent = std::bind(&CMonster::SetBloodEmitormaxOption, this, 300
-			, doublepoint{ 1,1 }, doublepoint{ 170,300 }, doublepoint{ 100,150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -5,5 }, doublepoint{ -5,5 });
+			, doublepoint{ scaleA * 1,scaleA * 1 }, doublepoint{ 170,300 }, doublepoint{ scaleA * 100,scaleA * 150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -scaleA * 5,scaleA * 5 }, doublepoint{ -scaleA * 5,scaleA * 5 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GruntHurtgroundLeft")->m_StartEvent = std::bind(&CMonster::SetBloodEmitormaxOption, this, 300
-			, doublepoint{ 1,1 }, doublepoint{ 240,370 }, doublepoint{ 100,150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -5,5 }, doublepoint{ -5,5 });
+			, doublepoint{ scaleA * 1,scaleA * 1 }, doublepoint{ 240,370 }, doublepoint{ scaleA * 100,scaleA * 150 }, doublepoint{ 0.3,0.7 }, doublepoint{ 0.01,0.02 }, doublepoint{ -scaleA * 5,scaleA * 5 }, doublepoint{ -scaleA * 5,scaleA * 5 });
 
 	
 
@@ -431,13 +431,13 @@ void CGrunt::Update()
 	if (ActionOrder == Action_Order::RunLeft && (OnWall || OnDoor)) // 벽에 붙었으면 서있기
 	{
 		ActionOrder = Action_Order::IdleLeft;
-		force.x -= 250000;
+		force.x -= scaleA * 250000;
 	}
 
 	if (ActionOrder == Action_Order::RunRight && (OnWall || OnDoor))
 	{
 		ActionOrder = Action_Order::IdleRight;
-		force.x += 250000;
+		force.x += scaleA * 250000;
 	}
 	
 	if (MainOrder == Main_Order::RoamAround && ActionOrder == Action_Order::WalkRight && (OnWall ||OnDoor) ) // 로밍 중 벽 만나면 뒤돌기
@@ -501,7 +501,7 @@ void CGrunt::Update()
 		{
 			if (!OnGround)
 			{
-				force.x -= 250000;
+				force.x -= scaleA * 250000;
 				FallStair = true;
 			}
 
@@ -515,7 +515,7 @@ void CGrunt::Update()
 		{
 			if (!OnGround)
 			{
-				force.x += 250000;
+				force.x += scaleA * 250000;
 				FallStair = true;
 			}
 
@@ -567,7 +567,7 @@ void CGrunt::Update()
 			
 
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntRunLeft");
-		force.x -= 250000;
+		force.x -= scaleA * 250000;
 
 		Run = true;
 	}
@@ -582,7 +582,7 @@ void CGrunt::Update()
 		}
 
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntRunRight");
-		force.x += 250000;
+		force.x += scaleA * 250000;
 
 		Run = true;
 
@@ -635,7 +635,7 @@ void CGrunt::Update()
 		}
 
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntWalkLeft");
-		force.x -= 250000;
+		force.x -= scaleA * 250000;
 
 		Walk = true;
 	}
@@ -650,7 +650,7 @@ void CGrunt::Update()
 		}
 
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntWalkRight");
-		force.x += 250000;
+		force.x += scaleA * 250000;
 
 		Walk = true;
 	}
@@ -658,7 +658,7 @@ void CGrunt::Update()
 
 	case Action_Order::HurtGround:
 	{
-		velocity.x = 1000 * cos(HurtAngle);
+		velocity.x = scaleA * 1000 * cos(HurtAngle);
 		
 		OnGround = false;
 		OnStair = 0;
@@ -670,8 +670,8 @@ void CGrunt::Update()
 
 	case Action_Order::HurtFly:
 	{
-		velocity.x = 1000 * cos(HurtAngle);
-		velocity.y = 1000 * sin(HurtAngle);
+		velocity.x = scaleA * 1000 * cos(HurtAngle);
+		velocity.y = scaleA * 1000 * sin(HurtAngle);
 		OnGround = false;
 		OnStair = 0;
 		MainOrder = Main_Order::End;

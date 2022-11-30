@@ -25,7 +25,7 @@
 
 #define Right 1
 #define Left -1
-#define JumpVelocity -550
+#define JumpVelocity -scaleA*550
 #define Animator0 dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 #define Animator1 dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])
 #define AttackSpeed 0.1
@@ -149,8 +149,8 @@ void CPlayer::GetInput()
 			Animator0->StartPlaying(L"HurtFlyBeginLeft");
 
 		//피격 물리효과 실행
-		velocity.x = 1000 * cos(HurtAngle);
-		velocity.y = 1000 * sin(HurtAngle);
+		velocity.x = scaleA * 1000 * cos(HurtAngle);
+		velocity.y = scaleA * 1000 * sin(HurtAngle);
 		OnGround = false;
 		OnStair = 0;
 
@@ -192,7 +192,7 @@ void CPlayer::GetInput()
 
 				//착지 이펙트 필요
 
-				LandCloud->Play(Pos + doublepoint{ 0,20 }, Resize);
+				LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize*scaleA *1.3 );
 			}
 
 		}
@@ -210,7 +210,7 @@ void CPlayer::GetInput()
 				WallGrab = 0;
 
 				//착지 이펙트 필요
-				LandCloud->Play(Pos + doublepoint{ 0,20 }, Resize);
+				LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize * scaleA *1.3);
 			}
 		}
 	}
@@ -310,7 +310,7 @@ void CPlayer::GetInput()
 			if (Animator0->GetCurAnimation()->GetName() != L"AttackLeft"
 				&& Animator0->GetCurAnimation()->GetName() != L"AttackRight")
 			{
-				force.x = -100000;
+				force.x = -scaleA * 100000;
 				Run = true;
 
 				//m_Velocity.y = -m_OnStair * m_Velocity.x
@@ -331,7 +331,7 @@ void CPlayer::GetInput()
 
 					if (Animator0->GetCurAnimation()->GetName() == L"RunLeft")
 					{
-						force.x -= 250000;
+						force.x -= scaleA * 250000;
 						Run = true;
 					}
 					
@@ -395,7 +395,7 @@ void CPlayer::GetInput()
 			if (Animator0->GetCurAnimation()->GetName() != L"AttackLeft"
 				&& Animator0->GetCurAnimation()->GetName() != L"AttackRight")
 			{
-				force.x = 100000;
+				force.x = scaleA * 100000;
 				Run = true;
 							
 			}
@@ -415,7 +415,7 @@ void CPlayer::GetInput()
 
 					if (Animator0->GetCurAnimation()->GetName() == L"RunRight")
 					{
-						force.x += 250000;
+						force.x += scaleA * 250000;
 						Run = true;
 					}
 
@@ -477,7 +477,7 @@ void CPlayer::GetInput()
 				}
 			}
 
-			force.y += 100000;
+			force.y += scaleA * 100000;
 		}
 
 
@@ -527,10 +527,12 @@ void CPlayer::GetInput()
 						dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"RollRight");
 						Roll = 1;
 
-						SetRollDustcloudOption(doublepoint{ 1.5,1.5 },doublepoint{ 170,240 }, doublepoint{ 70,100 },
-							doublepoint{ 0.5,0.7 }, doublepoint{ 0.001,0.002 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
+						SetRollDustcloudOption(doublepoint{ scaleA * 1.5,scaleA * 1.5 },doublepoint{ 170,240 }, doublepoint{ scaleA * 70,scaleA * 100 },
+							doublepoint{ 0.5,0.7 }, doublepoint{ 0.001,0.002 }, doublepoint{ 0,0 }, doublepoint{ -scaleA * 20,0 });
 					}
 				}
+
+				
 
 			}
 
@@ -549,8 +551,8 @@ void CPlayer::GetInput()
 						dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"RollLeft");
 						Roll = -1;
 
-						SetRollDustcloudOption(doublepoint{ 1.5,1.5 }, doublepoint{ -60,10 }, doublepoint{ 70,100 }, 
-							doublepoint{ 0.5,0.7 }, doublepoint{ 0.001,0.002 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
+						SetRollDustcloudOption(doublepoint{ scaleA * 1.5,scaleA * 1.5 }, doublepoint{ -60,10 }, doublepoint{ scaleA * 70,scaleA * 100 },
+							doublepoint{ 0.5,0.7 }, doublepoint{ 0.001,0.002 }, doublepoint{ 0,0 }, doublepoint{ -scaleA * 20,0 });
 					}
 				}
 
@@ -585,7 +587,7 @@ void CPlayer::GetInput()
 
 			//점프 이펙트 필요
 
-			JumpCloud->Play(Pos + doublepoint{ 0,-15 }, Resize);
+			JumpCloud->Play(Pos + doublepoint{ 0,0 }, Resize * scaleA*1.3);
 
 		}
 
@@ -635,8 +637,8 @@ void CPlayer::GetInput()
 
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-		velocity.x = 600 * 0.8* cos(AttackAngle);
-		velocity.y = 600 * sin(AttackAngle);
+		velocity.x = scaleA * 600 * 0.8* cos(AttackAngle);
+		velocity.y = scaleA * 600 * sin(AttackAngle);
 
 		if (AttackOnAir && velocity.y < 0)
 			velocity.y = 0;
@@ -696,7 +698,7 @@ void CPlayer::GetInput()
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			LandCloud->Play(Pos + doublepoint{ 0,20 }, Resize);
+			LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 		}
 
 		else
@@ -712,7 +714,7 @@ void CPlayer::GetInput()
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipRight");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				JumpCloudRight->Play(Pos + doublepoint{ 38,0 }, Resize);
+				JumpCloudRight->Play(Pos + doublepoint{ 20,0 }, Resize* scaleA*1.3);
 			}
 
 if (KeyMgr::Create()->key(Key::D).pressed)
@@ -744,7 +746,7 @@ TimeMgr::Create()->EndStopWatch();
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			LandCloud->Play(Pos + doublepoint{ 0,20 }, Resize);
+			LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 		}
 
 		else
@@ -760,7 +762,7 @@ TimeMgr::Create()->EndStopWatch();
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipLeft");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				JumpCloudLeft->Play(Pos + doublepoint{ -38,0 }, Resize);
+				JumpCloudLeft->Play(Pos + doublepoint{ -20,0 }, Resize* scaleA*1.3);
 			}
 
 			if (KeyMgr::Create()->key(Key::A).pressed)
@@ -831,25 +833,25 @@ void CPlayer::ManageEffector()
 	}
 
 
-	if (WallGrab == Right && velocity.y > 50)
+	if (WallGrab == Right && velocity.y > scaleA * 50)
 	{
 		SetWallDustcloudOption(doublepoint{ 2,2 }, doublepoint{ -30,30 }, doublepoint{ 70,100 },
 			doublepoint{ 0.3,1 }, doublepoint{ 0.02,0.05 }, doublepoint{ -5,0 }, doublepoint{ 0,0 });
 	}
 
-	else if (WallGrab == Right && velocity.y < -50)
+	else if (WallGrab == Right && velocity.y < -scaleA * 50)
 	{
 		SetWallDustcloudOption(doublepoint{ 2,2 }, doublepoint{ -30,30 }, doublepoint{ 70,100 },
 			doublepoint{ 0.3,1 }, doublepoint{ 0.02,0.05 }, doublepoint{ -5,0 }, doublepoint{ 0,0 });
 	}
 
-	else if (WallGrab == Left && velocity.y > 50)
+	else if (WallGrab == Left && velocity.y > scaleA * 50)
 	{
 		SetWallDustcloudOption(doublepoint{ 2,2 }, doublepoint{ 150,210 }, doublepoint{ 70,100 },
 			doublepoint{ 0.5,0.7 }, doublepoint{ 0.02,0.05 }, doublepoint{ -5,0 }, doublepoint{ 0,0 });
 	}
 
-	else if (WallGrab == Left && velocity.y < -50)
+	else if (WallGrab == Left && velocity.y < -scaleA * 50)
 	{
 		SetWallDustcloudOption(doublepoint{ 2,2 }, doublepoint{ 150,210 }, doublepoint{ 70,100 },
 			doublepoint{ 0.5,0.7 }, doublepoint{ 0.02,0.05 }, doublepoint{ -5,0 }, doublepoint{ 0,0 });
@@ -899,17 +901,17 @@ void CPlayer::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\right", L"FallRight", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\left", L"FallLeft", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\right", L"LandRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\left", L"LandLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\right", L"LandRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\left", L"LandLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\right", L"PreCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\left", L"PreCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\right", L"PreCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false,doublepoint{0,-5});
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\left", L"PreCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\right", L"PostCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\left", L"PostCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\right", L"PostCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\left", L"PostCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\right", L"CrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\left", L"CrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\right", L"CrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\left", L"CrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\right", L"WallGrabRight", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\left", L"WallGrabLeft", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
@@ -932,8 +934,8 @@ void CPlayer::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\right", L"HurtFlyLoopRight", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\left", L"HurtFlyLoopLeft", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\right", L"HurtGroundRight", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{0,10});
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\left", L"HurtGroundLeft", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{ 0,10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\right", L"HurtGroundRight", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{0,scaleA * 10});
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\left", L"HurtGroundLeft", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{ 0,scaleA * 10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"IdleToRunRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunRight");
@@ -1063,13 +1065,13 @@ void CPlayer::Initialize()
 	
 	RollDustcloud = new CDustcloudEmitor; //구르기 구름
 	RollDustcloud->SetOwner(this);
-	RollDustcloud->SetOffset(doublepoint{ 0,25 });
+	RollDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
 	RollDustcloud->SetOnOff(false);
 	RollDustcloud->Initialize();
 
 	RunDustcloud = new CDustcloudEmitor; //출발 구름
 	RunDustcloud->SetOwner(this);
-	RunDustcloud->SetOffset(doublepoint{ 0,25 });
+	RunDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
 	RunDustcloud->SetOnOff(false);
 	RunDustcloud->Initialize();
 
@@ -1083,7 +1085,7 @@ void CPlayer::Initialize()
 
 	WallDustcloud = new CDustcloudEmitor; //출발 구름
 	WallDustcloud->SetOwner(this);
-	WallDustcloud->SetOffset(doublepoint{ 0,25 });
+	WallDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
 	WallDustcloud->SetOnOff(false);
 
 

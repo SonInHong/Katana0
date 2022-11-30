@@ -25,10 +25,10 @@ void CGruntFist::Initialize()
 {
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
-	Scale.x = 10;
-	Scale.y = 10;
+	Scale.x = scaleA * 10;
+	Scale.y = scaleA * 10;
 
-	Speed = 75;
+	Speed = scaleA * 75;
 
 	
 }

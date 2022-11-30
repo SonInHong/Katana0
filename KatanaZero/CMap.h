@@ -13,7 +13,10 @@ public:
     virtual void Update();
     virtual void Render(HDC _dc);
     void Load(const std::wstring& _Path);
+    void Copy(double d);
+
 private:
     CTexture* Texture;
+    CTexture* TextureSU;
 };
 

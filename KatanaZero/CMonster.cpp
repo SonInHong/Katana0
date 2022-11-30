@@ -72,6 +72,8 @@ void CMonster::Update()
 	dynamic_cast<CRigidBody*>(GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetWalk() = false;
 	dynamic_cast<CRigidBody*>(GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetRun() = false;
 
+	//==================================================================================================
+
 	//레이저 감지 로직
 	doublepoint P1 = Pos;
 	doublepoint P2 = Pos + doublepoint{ (double)LookDirection * 100,0 };
@@ -90,6 +92,8 @@ void CMonster::Update()
 			LaserExist = LaserExist || CollisionMath::CheckifLineCollide(P1, P2, L1, L2);
 		}
 	}
+	
+	//==================================================================================================
 
 	if (MainOrder == Main_Order::LeanLeft)
 	{
@@ -117,13 +121,28 @@ void CMonster::Update()
 
 	}
 
-	if (MainOrder == Main_Order::Idle)
+	if (MainOrder == Main_Order::IdleRight)
 	{
-		if (LookDirection == Left)
-			ActionOrder = Action_Order::IdleRight;
+		LookDirection = Right;
+		ActionOrder = Action_Order::IdleRight;
 
-		if (LookDirection == Right)
-			ActionOrder = Action_Order::IdleLeft;
+		if (PlayerDetection())
+		{
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
+		}
+	}
+	
+	if (MainOrder == Main_Order::IdleLeft)
+	{
+		LookDirection = Left;
+		ActionOrder = Action_Order::IdleLeft;
+
+		if (PlayerDetection())
+		{
+			MainOrder = Main_Order::PlayerDetected;
+			ActionOrder = Action_Order::End;
+		}
 	}
 
 	if (MainOrder == Main_Order::RoamAround)

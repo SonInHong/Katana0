@@ -189,6 +189,7 @@
     <ClInclude Include="CPanelUI.h" />
     <ClInclude Include="CParticle.h" />
     <ClInclude Include="CParticleEmitor.h" />
+    <ClInclude Include="CPomp.h" />
     <ClInclude Include="CRigidBody.h" />
     <ClInclude Include="CScene_Tool.h" />
     <ClInclude Include="CStair.h" />
@@ -262,6 +263,7 @@
     <ClCompile Include="CPanelUI.cpp" />
     <ClCompile Include="CParticle.cpp" />
     <ClCompile Include="CParticleEmitor.cpp" />
+    <ClCompile Include="CPomp.cpp" />
     <ClCompile Include="CRigidBody.cpp" />
     <ClCompile Include="CScene_Tool.cpp" />
     <ClCompile Include="CStair.cpp" />

@@ -27,8 +27,8 @@ void CMap::Render(HDC _dc)
 
 	
 
-	doublepoint RealPos = CCameraMgr::Create()->RealCoordinate(doublepoint{0,0});
-	doublepoint RealScale = CCameraMgr::Create()->RealScale(doublepoint{(double)CCore::Create()->GetWindowData().width,(double)CCore::Create()->GetWindowData().height});
+	doublepoint RealPos = CCameraMgr::Create()->GetLeftTop();
+	doublepoint RealScale = CCameraMgr::Create()->GetScale();
 
 	doublepoint lefttop = RealPos;
 	doublepoint rightbottom = RealPos + RealScale;
@@ -52,6 +52,14 @@ void CMap::Render(HDC _dc)
 	//BitBlt(_dc, 0, 0, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height, Texture->GetDC(), 0, 0, SRCCOPY);
 	TransparentBlt(_dc, (int)CameraPos.x, (int)CameraPos.y, (int)CameraScale.x, (int)CameraScale.y, Texture->GetDC(), (int)lefttop.x, (int)lefttop.y, (int)RealScale.x, (int)RealScale.y, RGB(1, 1, 1));
 		//Texture->GetWidth(), Texture->GetHeight(), RGB(1, 1, 1));
+
+	
+
+
+	//doublepoint CameraPos = CCameraMgr::Create()->CameraCoordinate(Pos);
+	//doublepoint CameraScale = CCameraMgr::Create()->CameraScale(Scale);
+
+	//TransparentBlt(_dc, CameraPos.x, CameraPos.y, CameraScale.x, CameraScale.y, Texture->GetDC(), 0, 0, Scale.x, Scale.y, RGB(1, 1, 1));
 
 	CObject::Render(_dc);
 }
@@ -101,5 +109,26 @@ void CMap::Load(const std::wstring& _Path)
 
 	Scale.x = TileCount.x * TileSize.x;
 	Scale.y = TileCount.y * TileSize.y;
+
+	Copy(scaleA);
+
+}
+
+void CMap::Copy(double d)
+{
+	if (TextureSU)
+		return;
+
+	TextureSU = new CTexture;
+	TextureSU->MakeBlankTexture((int)(d * Scale.x), (int)(d * Scale.y));
+	TransparentBlt(TextureSU->GetDC(), 0, 0, TextureSU->GetWidth(), TextureSU->GetHeight()
+		, Texture->GetDC(), 0, 0,Texture->GetWidth(),Texture->GetHeight(),RGB(1,1,1));
+
+	Scale.x = TextureSU->GetWidth();
+	Scale.y = TextureSU->GetHeight();
+
+	delete Texture;
+	Texture = TextureSU;
+	TextureSU = nullptr;
 
 }

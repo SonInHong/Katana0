@@ -72,6 +72,7 @@ void CCore::Update()
 	CSceneMgr::Create()->ComponentUpdate(); // 컴포넌트 업데이트
 	CColliderMgr::Create()->Update(); // 충돌처리
 	//CSceneMgr::Create()->Clean(); // 충돌후 삭제처리
+	CCameraMgr::Create()->LateUpdate();
 
 }
 

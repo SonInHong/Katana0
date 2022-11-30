@@ -31,10 +31,10 @@ CSword::CSword()
 
 	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->FindAnimation(L"DragonSlashLeft")->m_CompleteEvent = std::bind(&CEventMgr::Event_DestroyObj, CEventMgr::Create(), this);
 
-	Scale.x = 30;
-	Scale.y = 30;
+	Scale.x = scaleA * 30;
+	Scale.y = scaleA * 30;
 
-	Speed = 1000;
+	Speed = scaleA * 1000;
 
 	hiteffect = new CHitEffect;
 }
@@ -164,7 +164,7 @@ bool CSword::Colliding(CObject* other)
 			, doublepoint{ Pos.x + 1500 * cos(Angle), Pos.y + 1500 * sin(Angle) }
 		, 30000, 2000);
 
-		Valid = false;
+		//Valid = false;
 		OffSet = doublepoint{ 0,0 };
 		Pos.x = Owner->GetPos().x + OffSet.x;
 		Pos.y = Owner->GetPos().y + OffSet.y;

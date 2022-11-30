@@ -120,7 +120,8 @@ enum class Main_Order
 {
 	LeanLeft,
 	LeanRight,
-	Idle,
+	IdleRight,
+	IdleLeft,
 	RoamAround,
 	GetToRoamingPoint,
 	PlayerDetected,
@@ -199,4 +200,4 @@ union CollisionID
 #define ColliderRender 1
 #define Right 1
 #define Left -1
-
+#define scaleA 1.5

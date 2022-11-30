@@ -5,6 +5,7 @@
 #include "CMap.h"
 #include "CMonster.h"
 #include "CGrunt.h"
+#include "CPomp.h"
 #include "CColliderMgr.h"
 #include "CCameraMgr.h"
 #include "CCore.h"
@@ -26,6 +27,7 @@
 #include "CNormalDoorRight.h"
 #include "CNormalDoorLeft.h"
 #include "CLaser.h"
+
 
 
 CScene_Start::CScene_Start()
@@ -64,35 +66,42 @@ void CScene_Start::Enter()
 	//Player 추가
 	CPlayer* _pObj = new CPlayer;
 
-	_pObj->SetPos(doublepoint{ 100,0 });
-	_pObj->SetScale(doublepoint{ 15,30 });
-	_pObj->SetResize(doublepoint{ 2,2 });
+	_pObj->SetPos(doublepoint{ scaleA*100,scaleA * 0 });
+	_pObj->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	_pObj->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
 
 	AddObject(_pObj, GROUP_TYPE::PLAYER);
 
 	//Monster 추가
 	
 	CGrunt* _pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ 400,200 });
-	_pMon->SetScale(doublepoint{15,30});
-	_pMon->SetResize(doublepoint{ 2,2 });
-	_pMon->SetRoamingPoint(doublepoint{ 600,200 });
+	_pMon->SetPos(doublepoint{ scaleA * 400,scaleA * 200 });
+	_pMon->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	_pMon->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pMon->SetRoamingPoint(doublepoint{ scaleA * 600,scaleA * 200 });
 	_pMon->SetMainOrder(Main_Order::LeanLeft);
 	AddObject(_pMon, GROUP_TYPE::MONSTER);
 	
 	_pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ 600,400 });
-	_pMon->SetScale(doublepoint{ 15,30 });
-	_pMon->SetResize(doublepoint{ 2,2 });
-	_pMon->SetRoamingPoint(doublepoint{ 600,500 });
+	_pMon->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });
+	_pMon->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	_pMon->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pMon->SetRoamingPoint(doublepoint{ scaleA * 600,scaleA * 500 });
 	AddObject(_pMon, GROUP_TYPE::MONSTER);
+
+	//_pMon = new CGrunt;
+	//_pMon->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });
+	//_pMon->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	//_pMon->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	//_pMon->SetRoamingPoint(doublepoint{ scaleA * 300,scaleA * 500 });
+	//AddObject(_pMon, GROUP_TYPE::MONSTER);
 	
-	_pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ 600,400 });
-	_pMon->SetScale(doublepoint{ 15,30 });
-	_pMon->SetResize(doublepoint{ 2,2 });
-	_pMon->SetRoamingPoint(doublepoint{ 300,500 });
-	AddObject(_pMon, GROUP_TYPE::MONSTER);
+	CPomp* _pPom = new CPomp;
+	_pPom->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });
+	_pPom->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	_pPom->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pPom->SetRoamingPoint(doublepoint{ scaleA * 300,scaleA * 500 });
+	AddObject(_pPom, GROUP_TYPE::MONSTER);
 
 	
 
@@ -101,56 +110,56 @@ void CScene_Start::Enter()
 	//Floor 추가
 	
 	CStair* _pStair1 = new CStair;                                 //오른쪽 큰 계단
-	_pStair1->SetScale(doublepoint{ 300, 300 });
-	_pStair1->SetPos(doublepoint{ 905, 438.5 });
+	_pStair1->SetScale(doublepoint{ scaleA * 300, scaleA * 300 });
+	_pStair1->SetPos(doublepoint{ scaleA * 905,scaleA * 438.5 });
 	_pStair1->SetDir(Right);
 	AddObject(_pStair1, GROUP_TYPE::FLOOR);
 
 	CStairCensor* _pCensor = new CStairCensor; //센서
-	_pCensor->SetPos(doublepoint{ 1006,286 });
+	_pCensor->SetPos(doublepoint{ scaleA * 1006,scaleA * 286 });
 	//AddObject(_pCensor, GROUP_TYPE::CENSOR);
 
 	CStair* _pStair2 = new CStair;                                         //왼쪽 작은 계단
-	_pStair2->SetScale(doublepoint{ 60, 60 });
-	_pStair2->SetPos(doublepoint{ 510, 318.5 });
+	_pStair2->SetScale(doublepoint{ scaleA * 60,scaleA * 60 });
+	_pStair2->SetPos(doublepoint{ scaleA * 510, scaleA * 318.5 });
 	_pStair2->SetDir(Left);
 	AddObject(_pStair2, GROUP_TYPE::FLOOR);
 
 	CFloor* _pFloor1 = new CFloor;									//메인 바닥
-	_pFloor1->SetScale(doublepoint{ 800, 60 });
-	_pFloor1->SetPos(doublepoint{ 370, 607.5 });
+	_pFloor1->SetScale(doublepoint{ scaleA * 800, scaleA * 60 });
+	_pFloor1->SetPos(doublepoint{ scaleA * 370, scaleA * 607.5 });
 	AddObject(_pFloor1, GROUP_TYPE::FLOOR);
 
 	CFloor* _pFloor2 = new CFloor;											//2층계단 오른쪽 바닥
-	_pFloor2->SetScale(doublepoint{ 200, 60 });
-	_pFloor2->SetPos(doublepoint{ 1156, 318.5 });
+	_pFloor2->SetScale(doublepoint{ scaleA * 200,scaleA * 60 });
+	_pFloor2->SetPos(doublepoint{ scaleA * 1156, scaleA * 318.5 });
 	AddObject(_pFloor2, GROUP_TYPE::FLOOR);
 		
 	CFloor* _pFloor = new CFloor;
-	_pFloor->SetScale(doublepoint{ 480, 60 });
-	_pFloor->SetPos(doublepoint{ 240, 318.5 });
+	_pFloor->SetScale(doublepoint{ scaleA * 480,scaleA * 60 });
+	_pFloor->SetPos(doublepoint{ scaleA * 240, scaleA * 318.5 });
 	//AddObject(_pFloor, GROUP_TYPE::FLOOR);
 
 	
 
 	CTopFloor* _pTopFloor1 = new CTopFloor;							//계단 왼쪽 바닥
-	_pTopFloor1->SetScale(doublepoint{ 575, 60 });
-	_pTopFloor1->SetPos(doublepoint{ 767.5, 318.5 });
+	_pTopFloor1->SetScale(doublepoint{ scaleA * 575, scaleA * 60 });
+	_pTopFloor1->SetPos(doublepoint{ scaleA * 767.5, scaleA * 318.5 });
 	AddObject(_pTopFloor1, GROUP_TYPE::FLOOR);
 
 	CTopFloor* _pTopFloor2 = new CTopFloor;										// 굴뚝 위 바닥
-	 _pTopFloor2->SetScale(doublepoint{ 200, 35 });
-	 _pTopFloor2->SetPos(doublepoint{ 75, 117 });
+	 _pTopFloor2->SetScale(doublepoint{ scaleA * 200, scaleA * 35 });
+	 _pTopFloor2->SetPos(doublepoint{ scaleA * 75, scaleA * 117 });
 	AddObject(_pTopFloor2, GROUP_TYPE::FLOOR);
 
 	CTopFloor* _pTopFloor3 = new CTopFloor;											//2층 문 뒤 바닥
-	_pTopFloor3->SetScale(doublepoint{ 480, 60 });
-	_pTopFloor3->SetPos(doublepoint{ 240, 318.5 });
+	_pTopFloor3->SetScale(doublepoint{ scaleA * 480, scaleA * 60 });
+	_pTopFloor3->SetPos(doublepoint{ scaleA * 240, scaleA * 318.5 });
 	AddObject(_pTopFloor3, GROUP_TYPE::FLOOR);
 
 	CFloorCeiling* _pCeiling = new CFloorCeiling;
-	_pCeiling->SetScale(doublepoint{ 60, 10 });
-	_pCeiling->SetPos(doublepoint{ 480, 220 });
+	_pCeiling->SetScale(doublepoint{ scaleA * 60, scaleA * 10 });
+	_pCeiling->SetPos(doublepoint{ scaleA * 480, scaleA * 220 });
 	//AddObject(_pCeiling, GROUP_TYPE::FLOOR);
 
 
@@ -174,46 +183,46 @@ void CScene_Start::Enter()
 
 	// 벽
 	CWall* _pWall = new CWall;
-	_pWall->SetScale(doublepoint{ 35,700 });
-	_pWall->SetPos(doublepoint{ 17,300 });
+	_pWall->SetScale(doublepoint{ scaleA * 35,scaleA * 700 });
+	_pWall->SetPos(doublepoint{ scaleA * 17,scaleA * 300 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
 
 	_pWall = new CWall;
-	_pWall->SetScale(doublepoint{ 35,400 });
-	_pWall->SetPos(doublepoint{ 157,300 });
+	_pWall->SetScale(doublepoint{ scaleA * 35,scaleA * 400 });
+	_pWall->SetPos(doublepoint{ scaleA * 157,scaleA * 300 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
 
 	_pWall = new CWall;
-	_pWall->SetScale(doublepoint{ 35,700 });
-	_pWall->SetPos(doublepoint{ 1260,400 });
+	_pWall->SetScale(doublepoint{ scaleA * 35,scaleA * 700 });
+	_pWall->SetPos(doublepoint{ scaleA * 1260,scaleA * 400 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
 
 	_pWall = new CWall;
-	_pWall->SetScale(doublepoint{ 60,225 });
-	_pWall->SetPos(doublepoint{ 480,112.5 });
+	_pWall->SetScale(doublepoint{ scaleA * 60,scaleA * 225 });
+	_pWall->SetPos(doublepoint{ scaleA * 480,scaleA * 112.5 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
 
 	//문
 	
 
 	CNormalDoorRight* _pDoor = new CNormalDoorRight;
-	_pDoor->SetScale(doublepoint{ 30,127 });
-	_pDoor->SetAnimationScaling(doublepoint{ 2,2 });
-	_pDoor->SetPos(doublepoint{ 380,225 });
+	_pDoor->SetScale(doublepoint{ scaleA * 30,scaleA * 127 });
+	_pDoor->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pDoor->SetPos(doublepoint{ scaleA * 380,scaleA * 225 });
 	AddObject(_pDoor, GROUP_TYPE::FLOOR);
 
 	CNormalDoorLeft* _pDoor2 = new CNormalDoorLeft;
-	_pDoor2->SetScale(doublepoint{ 30,127 });
-	_pDoor2->SetAnimationScaling(doublepoint{ 2,2 });
-	_pDoor2->SetPos(doublepoint{ 680,225 });
+	_pDoor2->SetScale(doublepoint{ scaleA * 30,scaleA * 127 });
+	_pDoor2->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pDoor2->SetPos(doublepoint{ scaleA * 680,scaleA * 225 });
 	AddObject(_pDoor2, GROUP_TYPE::FLOOR);
 
 
 	//레이저
 	CLaser* _pLaser = new CLaser;
-	_pLaser->SetPos(doublepoint{ 900,200 });
-	_pLaser->SetScale(doublepoint{ 30,200 });
-	_pLaser->SetAnimationScaling(doublepoint{ 2,2 });
+	_pLaser->SetPos(doublepoint{ scaleA * 900,scaleA * 200 });
+	_pLaser->SetScale(doublepoint{ scaleA * 30,scaleA * 200 });
+	_pLaser->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
 	AddObject(_pLaser, GROUP_TYPE::TRAP);
 
 	// 파티클
@@ -264,7 +273,7 @@ void CScene_Start::Enter()
 
 	//카메라 모드 지정
 	CCameraMgr::Create()->SetCameraMode(CameraMode::FollowPlayer);
-	//CCameraMgr::Create()->SetCameraLimit(-200, 1500, -100, 700);
+	CCameraMgr::Create()->SetCameraLimit(_pMap->GetPos().x-300, _pMap->GetPos().x +_pMap->GetScale().x+300, _pMap->GetPos().y - 300, _pMap->GetPos().y + _pMap->GetScale().y + 300);
 }
 
 void CScene_Start::Exit()

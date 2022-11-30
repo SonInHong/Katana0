@@ -52,7 +52,7 @@ void CHitEffect::Render(HDC _dc)
 	{
 
 		doublepoint pos = CCameraMgr::Create()->CameraCoordinate(Pos - vector * 4* i);
-		AlphaBlend(_dc, pos.x - 5, pos.y - 5, 10, 10, Texture->GetDC(), t-20/Length*i, 0, 5, 5, func);
+		AlphaBlend(_dc, pos.x - 5, pos.y - 5, scaleA * 10, scaleA * 10, Texture->GetDC(), t-20/Length*i, 0, 5, 5, func);
 		
 	}
 
