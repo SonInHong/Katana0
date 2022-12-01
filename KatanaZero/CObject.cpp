@@ -58,6 +58,15 @@ void CObject::Render(HDC _dc)
 	}
 }
 
+void CObject::ReRender(HDC _dc)
+{
+	for (int i = 0; i < (UINT)COMPONENT_TYPE::END; ++i)
+	{
+		for (int j = 0; j < m_Component[i].size(); ++j)
+			m_Component[i][j]->ReRender(_dc);
+	}
+}
+
 void CObject::Destroy()
 {
 	for (int i = 0; i < (UINT)COMPONENT_TYPE::END; ++i)

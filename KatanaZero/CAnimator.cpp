@@ -9,6 +9,7 @@
 CAnimator::CAnimator()
 	:m_mapAnim{}
 	, m_pCurAnim(nullptr)
+	,ReRendering(false)
 {
 }
 
@@ -206,4 +207,18 @@ void CAnimator::Render(HDC _dc)
 		m_pCurAnim->Render(_dc);
 
 	}
+}
+
+void CAnimator::ReRender(HDC _dc)
+{
+	if (ReRendering)
+	{
+		if (m_pCurAnim != nullptr)
+		{
+			m_pCurAnim->ReRender(_dc);
+
+		}
+	}
+
+	
 }

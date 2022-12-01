@@ -35,8 +35,9 @@ public:
 
     virtual void Update();
     virtual void Render(HDC _dc);
+    virtual void ReRender(HDC _dc);
 
-
+    void SetReRender(bool b) { ReRendering = b; }
 
 
 
@@ -46,7 +47,7 @@ public:
 private:
     std::map<std::wstring, CAnimation*> m_mapAnim;
     CAnimation* m_pCurAnim;
-
+    bool ReRendering;
 
 
 

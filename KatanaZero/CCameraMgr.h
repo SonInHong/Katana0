@@ -27,10 +27,14 @@ public:
 	HDC GetYellowDC() { return yellowDC; }
 	HDC GetBlackDC() { return blackDC; }
 	HDC GetcomDC() { return comDC; }
+	HDC GetAquaDC() { return AquaDC; }
 
 	void SetCameraEffect(CameraEffect p) { effect = p; }
 	void SetCameraMode(CameraMode p) { mode = p; }
 	void SetCameraLimit(double left, double right, double upper, double bottom) { LeftLimit = left; RightLimit = right; UpperLimit = upper; BottomLimit = bottom; }
+	void SetCameraRenderMode(CameraRenderMode p) { rendermode = p; }
+
+	void Render(HDC _dc);
 
 private:
 	doublepoint LeftTop;
@@ -40,6 +44,9 @@ private:
 	HBITMAP yellowBitmap;
 	HDC blackDC;
 	HBITMAP blackBitmap;
+
+	HDC AquaDC;
+	HBITMAP AquaBitmap;
 
 	HDC comDC;
 	HBITMAP comBitmap;
@@ -56,6 +63,7 @@ private:
 	double BottomLimit;
 
 	CameraMode mode;
+	CameraRenderMode rendermode;
 
 	double frametime;
 

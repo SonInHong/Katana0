@@ -49,6 +49,7 @@ public:
 	virtual void Update();
 	virtual void ComponentUpdate() final;
 	virtual void Render(HDC _dc);
+	virtual void ReRender(HDC _dc);
 	virtual void Destroy();
 	virtual void Save(FILE* file);
 	virtual void Load(FILE* file);

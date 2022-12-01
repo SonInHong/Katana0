@@ -13,6 +13,7 @@ public:
     virtual void Update();
 
     virtual bool Collide(CObject* other);
+    virtual bool Colliding(CObject* other);
 
 private:
     CObject* Owner;

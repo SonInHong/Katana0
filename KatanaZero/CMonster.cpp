@@ -25,7 +25,6 @@ CMonster::CMonster()
 	:Texture(nullptr)
 	, IgnoreTopFloorList{}
 	, RecogniseTopFloorList{}
-	, MainOrder(Main_Order::GetToRoamingPoint)
 	, MoveOrder(Move_Order::End)
 	, ActionOrder(Action_Order::End)
 	, RoamingPoint{}
@@ -37,8 +36,9 @@ CMonster::CMonster()
 	,Burn(false)
 	,Dead(false)
 	, LaserExist(false)
-	, DetectOthersDeathRange(300)
+	, DetectOthersDeathRange(300*scaleA)
 {
+	MainOrder = Main_Order::GetToRoamingPoint;
 }
 
 CMonster::~CMonster()
@@ -48,15 +48,16 @@ CMonster::~CMonster()
 
 void CMonster::Initialize()
 {
-		
+	CreateAnimator(); // 메인 애니메이션
+	CreateAnimator(); // 칼 이펙트
+	CreateAnimator(); // UI 이펙트용 애니메이션
+
 	CreateRigidBody();		
 	AdjustRoamingFloor(RoamingPoint);
 
-	BloodEmitor = new CBloodEmitor; //피
-	BloodEmitor->SetOwner(this);
-	BloodEmitor->SetOffset(doublepoint{ 0,0 });
-	BloodEmitor->SetOnOff(false);
-	BloodEmitor->Initialize();
+	CAnimal::Initialize();
+
+
 	
 }
 
@@ -76,7 +77,7 @@ void CMonster::Update()
 
 	//레이저 감지 로직
 	doublepoint P1 = Pos;
-	doublepoint P2 = Pos + doublepoint{ (double)LookDirection * 100,0 };
+	doublepoint P2 = Pos + doublepoint{ (double)LookDirection * 150,0 };
 
 	LaserExist = false;
 
@@ -281,11 +282,31 @@ void CMonster::Update()
 		SetBloodEmitor(false);
 		Burn = true;
 		Dead = true;
+
+		if (lasoremitorcount < 1)
+			SetLaserParticleOption(doublepoint{ 1,1 }, doublepoint{ 190,350 }, doublepoint{ 70,500 }, doublepoint{ 0.3,1 }, doublepoint{ 0.001,0.01 }, doublepoint{ -10,10 }, doublepoint{ 0,0 });
+
+		lasoremitorcount++;
+	}
+
+	if (MainOrder == Main_Order::Dead)
+	{
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().x = 0;
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().y = 0;
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->SetGravity(false);
+
+		Dead = true;
+		SetBloodEmitor(false);
+	}
+
+	if (MainOrder == Main_Order::MonsterStun)
+	{
+		ActionOrder = Action_Order::Stun;
 	}
 	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
-	BloodEmitor->Update();
+	CAnimal::Update();
 }
 
 void CMonster::Render(HDC _dc)
@@ -343,22 +364,7 @@ void CMonster::AdjustRoamingFloor(doublepoint p)
 	}
 }
 
-void CMonster::SetBloodEmitor(bool b)
-{
-	BloodEmitor->SetOnOff(b);
-}
 
-void CMonster::SetBloodEmitorOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	BloodEmitor->SetOption(resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	BloodEmitor->SetOnOff(true);
-}
-
-void CMonster::SetBloodEmitormaxOption(int maxcount, doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	BloodEmitor->SetOption(maxcount,resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	BloodEmitor->SetOnOff(true);
-}
 
 bool CMonster::PlayerDetection()
 {

@@ -18,7 +18,7 @@ CGrunt::CGrunt()
 {
 	RoamingDistance = 300;
 	DetectAngle = 30;
-	DetectRange = 400;
+	DetectRange = 600;
 	EyeOffset = doublepoint{ 0,-20 };
 }
 
@@ -29,7 +29,7 @@ CGrunt::~CGrunt()
 void CGrunt::Initialize()
 {
 	CMonster::Initialize();
-	CreateAnimator();
+	
 	CreateCollider(doublepoint{ 0,10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_idle\\right", L"GruntIdleRight", doublepoint{ 0,0 }, doublepoint{ 30,36 }, 8, 0.07, true);
@@ -44,20 +44,36 @@ void CGrunt::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_turn\\right", L"GruntTurnRight", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 8, 0.1, false);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_turn\\left", L"GruntTurnLeft", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 8, 0.1, false);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_attack\\right", L"GruntAttackRight", doublepoint{ 0,0 }, doublepoint{ 44,42 }, 8, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_attack\\left", L"GruntAttackLeft", doublepoint{ 0,0 }, doublepoint{ 44,42 }, 8, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_attack\\right", L"GruntAttackRight", doublepoint{ 0,0 }, doublepoint{ 44,42 }, 8, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_attack\\left", L"GruntAttackLeft", doublepoint{ 0,0 }, doublepoint{ 44,42 }, 8, 0.04, false);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtfly\\right", L"GruntHurtflyRight", doublepoint{ 0,0 }, doublepoint{ 43,37 }, 2, 0.07, false);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtfly\\left", L"GruntHurtflyLeft", doublepoint{ 0,0 }, doublepoint{ 43,37 }, 2, 0.07, false);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtground\\right", L"GruntHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 56,41 }, 16, 0.1, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtground\\left", L"GruntHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 56,41 }, 16, 0.1, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtground\\right", L"GruntHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 56,41 }, 16, 0.1, false , doublepoint{0,-10});
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_hurtground\\left", L"GruntHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 56,41 }, 16, 0.1, false, doublepoint{ 0,-10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\right", L"GruntFallRight", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_fall\\left", L"GruntFallLeft", doublepoint{ 0,0 }, doublepoint{ 38,32 }, 13, 0.04, true);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\right", L"GruntLeanRight", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true , doublepoint{ scaleA * 5,0});
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_grunt_lean\\left", L"GruntLeanLeft", doublepoint{ 0,0 }, doublepoint{ 20,38 }, 1, 0.04, true, doublepoint{ -scaleA * 5,0 });
+
+	//주먹 이펙트 및 이벤트 설정
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_gruntslash\\right", L"GruntFistRight", doublepoint{ 0,0 }, doublepoint{ 64,64 }, 8, 0.04, false, doublepoint{ 10,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Enemy\\Grunt\\spr_gruntslash\\left", L"GruntFistLeft", doublepoint{ 0,0 }, doublepoint{ 64,64 }, 8, 0.04, false , doublepoint{-10,-10});
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])
+		->FindAnimation(L"GruntFistRight")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])
+		->FindAnimation(L"GruntFistLeft")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"GruntAttackRight")->m_StartEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]), L"GruntFistRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"GruntAttackLeft")->m_StartEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]), L"GruntFistLeft");
 
 	//==============================================================================================================================================================
 	//이벤트 지정
@@ -402,8 +418,10 @@ void CGrunt::Update()
 			MainOrder = Main_Order::RoamAround;
 	}
 
+	
+
 	doublepoint diff = (player->GetPos() - Pos);              // 공격수행 조건
-	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 80 && diff.x * LookDirection >= 0)
+	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 150 && diff.x * LookDirection >= 0)
 	{
 		if (LookDirection == Right)
 			ActionOrder = Action_Order::AttackRight;
@@ -413,19 +431,19 @@ void CGrunt::Update()
 	}
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"GruntAttackRight"
-		&&MainOrder != Main_Order::GetHurt)   // 피격시가 아니라면 공격은 무조건 마무리
+		&&MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 공격은 무조건 마무리
 		ActionOrder = Action_Order::AttackRight;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"GruntAttackLeft"
-		&& MainOrder != Main_Order::GetHurt)
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)
 		ActionOrder = Action_Order::AttackLeft;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"GruntTurnRight"
-		&& MainOrder != Main_Order::GetHurt)   // 피격시가 아니라면 턴동작은 무조건 마무리
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 턴동작은 무조건 마무리
 		ActionOrder = Action_Order::TurnRight;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"GruntTurnLeft"
-		&& MainOrder != Main_Order::GetHurt)
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)
 		ActionOrder = Action_Order::TurnLeft;
 		
 	if (ActionOrder == Action_Order::RunLeft && (OnWall || OnDoor)) // 벽에 붙었으면 서있기
@@ -617,12 +635,14 @@ void CGrunt::Update()
 	case Action_Order::AttackLeft:
 	{
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackLeft");
+	
 	}
 	break;
 
 	case Action_Order::AttackRight:
 	{
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackRight");
+		
 	}
 	break;
 

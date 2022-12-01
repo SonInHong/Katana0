@@ -28,6 +28,10 @@ public:
 		case PenColor::MAGENTA:
 			return MagentaBrush;
 			break;
+
+		case PenColor::AQUA:
+			return AquaBrush;
+			break;
 		}
 
 		return 0;
@@ -39,5 +43,6 @@ private:
 	HBRUSH SkyBrush = 0;
 	HBRUSH YellowBrush = 0;
 	HBRUSH MagentaBrush = 0;
+	HBRUSH AquaBrush = 0;
 };
 

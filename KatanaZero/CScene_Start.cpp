@@ -27,7 +27,7 @@
 #include "CNormalDoorRight.h"
 #include "CNormalDoorLeft.h"
 #include "CLaser.h"
-
+#include "CEffectMgr.h"
 
 
 CScene_Start::CScene_Start()
@@ -53,6 +53,9 @@ void CScene_Start::Enter()
 	//카메라리셋
 	CCameraMgr::Create()->Reset();
 		
+	//이펙트매니저 이펙트들 넣기
+	CEffectMgr::Create()->PutInBox();
+
 	//Map 추가
 	CMap* _pMap = new CMap;
 	_pMap->Load(L"Map.tile");
@@ -220,7 +223,7 @@ void CScene_Start::Enter()
 
 	//레이저
 	CLaser* _pLaser = new CLaser;
-	_pLaser->SetPos(doublepoint{ scaleA * 900,scaleA * 200 });
+	_pLaser->SetPos(doublepoint{ scaleA * 900,scaleA * 180 });
 	_pLaser->SetScale(doublepoint{ scaleA * 30,scaleA * 200 });
 	_pLaser->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
 	AddObject(_pLaser, GROUP_TYPE::TRAP);
@@ -270,6 +273,7 @@ void CScene_Start::Enter()
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER, GROUP_TYPE::MONSTER_PROJECTILE);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::MONSTER, GROUP_TYPE::TRAP);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER, GROUP_TYPE::TRAP);
+	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER_PROJECTILE, GROUP_TYPE::MONSTER_PROJECTILE);
 
 	//카메라 모드 지정
 	CCameraMgr::Create()->SetCameraMode(CameraMode::FollowPlayer);

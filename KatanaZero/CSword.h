@@ -19,7 +19,7 @@ public:
     virtual bool Collide(CObject* other);
     virtual bool Colliding(CObject* other);
     void SetAngle(double a) { Angle = a; }
-
+    CPlayer* GetOwner() { return Owner; }
  
 
     void SetValid(bool b) { Valid = b; }
@@ -27,7 +27,7 @@ public:
 
 private:
     CTexture* Texture;
-    CObject* Owner;
+    CPlayer* Owner;
     float Speed;
     doublepoint OffSet;
     int Direction;
@@ -37,7 +37,6 @@ private:
     double Timer;
     double Length;
 
-    CHitEffect* hiteffect;
 
     friend CPlayer;
 };

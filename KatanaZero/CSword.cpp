@@ -9,7 +9,7 @@
 #include "CMonster.h"
 #include "CDoor.h"
 #include "CCameraMgr.h"
-
+#include "CEffectMgr.h"
 
 CSword::CSword()
 	:Texture(nullptr)
@@ -18,7 +18,6 @@ CSword::CSword()
 	,OffSet{}
 	,Direction(1)
 	, Angle(0)
-	,hiteffect(nullptr)
 {
 	CreateCollider();
 	//CreateAnimator();
@@ -36,7 +35,7 @@ CSword::CSword()
 
 	Speed = scaleA * 1000;
 
-	hiteffect = new CHitEffect;
+	
 }
 
 CSword::~CSword()
@@ -50,7 +49,7 @@ void CSword::Initialize()
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
 	
-	CEventMgr::Create()->Event_CreateObj(hiteffect, GROUP_TYPE::FINALEFFECT);
+	
 
 	//if(cos(Angle)>0)
 	//	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"DragonSlashRight");
@@ -63,27 +62,29 @@ void CSword::Initialize()
 
 void CSword::Update()
 {
+	if (Timer < 0 || !Valid)
+	{
+		Valid = false;
+		OffSet = doublepoint{ 0,0 };
+		Pos.x = Owner->GetPos().x + OffSet.x;
+		Pos.y = Owner->GetPos().y + OffSet.y;
+
+		Timer = 1;
+
+		return;
+	}
+
 	if (Valid)
 	{
 		//if (OffSet.Norm() > 50 || OffSet.Norm() < -50)
 			//Direction = -1;
 
-		if (Timer < 0)
-		{
-			Valid = false;
-			OffSet = doublepoint{ 0,0 };
-			Pos.x = Owner->GetPos().x + OffSet.x;
-			Pos.y = Owner->GetPos().y + OffSet.y;
-
-			Timer = 1;
-
-			return;
-		}
+		
 			
 
 	
 
-		if (OffSet.Norm() < 70)
+		if (OffSet.Norm() < 70 * scaleA)
 		{
 			OffSet.x += cos(Angle) * Speed * TimeMgr::Create()->dt();
 			OffSet.y += sin(Angle) * Speed * TimeMgr::Create()->dt();
@@ -119,16 +120,17 @@ bool CSword::Collide(CObject* other)
 		mon->HurtAngle = Angle;
 
 		CCameraMgr::Create()->SetCameraEffect(CameraEffect::SHAKE);
-		hiteffect->Shoot(doublepoint{ Pos.x - 1500*cos(Angle), Pos.y - 1500 * sin(Angle) }
-						, doublepoint{ Pos.x + 1500 * cos(Angle), Pos.y + 1500 * sin(Angle) }
-						, 30000, 2000);
+		CEffectMgr::Create()->HitEffect->Shoot(doublepoint{ Pos.x - 1500 * cos(Angle), Pos.y - 1500 * sin(Angle) }
+			, doublepoint{ Pos.x + 1500 * cos(Angle), Pos.y + 1500 * sin(Angle) }
+		, 30000, 2000);
+		
 
-		Valid = false;
-		OffSet = doublepoint{ 0,0 };
-		Pos.x = Owner->GetPos().x + OffSet.x;
-		Pos.y = Owner->GetPos().y + OffSet.y;
+		//Valid = false;
+		//OffSet = doublepoint{ 0,0 };
+		//Pos.x = Owner->GetPos().x + OffSet.x;
+		//Pos.y = Owner->GetPos().y + OffSet.y;
 
-		Timer = 1;
+		//Timer = 1;
 
 		return true;
 	}
@@ -160,16 +162,16 @@ bool CSword::Colliding(CObject* other)
 		mon->HurtAngle = Angle;
 
 		CCameraMgr::Create()->SetCameraEffect(CameraEffect::SHAKE);
-		hiteffect->Shoot(doublepoint{ Pos.x - 1500 * cos(Angle), Pos.y - 1500 * sin(Angle) }
+		CEffectMgr::Create()->HitEffect->Shoot(doublepoint{ Pos.x - 1500 * cos(Angle), Pos.y - 1500 * sin(Angle) }
 			, doublepoint{ Pos.x + 1500 * cos(Angle), Pos.y + 1500 * sin(Angle) }
 		, 30000, 2000);
 
 		//Valid = false;
-		OffSet = doublepoint{ 0,0 };
-		Pos.x = Owner->GetPos().x + OffSet.x;
-		Pos.y = Owner->GetPos().y + OffSet.y;
+		//OffSet = doublepoint{ 0,0 };
+		//Pos.x = Owner->GetPos().x + OffSet.x;
+		//Pos.y = Owner->GetPos().y + OffSet.y;
 
-		Timer = 1;
+		//Timer = 1;
 
 		return true;
 	}

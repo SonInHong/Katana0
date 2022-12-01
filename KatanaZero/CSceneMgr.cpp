@@ -5,7 +5,7 @@
 #include "CCore.h"
 #include "CTexture.h"
 #include "CResourceMgr.h"
-
+#include "CCameraMgr.h"
 
 CSceneMgr::CSceneMgr()
 	:m_arrScene{}
@@ -24,7 +24,7 @@ void CSceneMgr::Initialize()
 
 	m_pCurScene = m_arrScene[(UINT)SCENE_TYPE::START];
 
-	m_pCurScene->Enter();
+	
 }
 
 void CSceneMgr::Update()
@@ -54,7 +54,5 @@ void CSceneMgr::Render(HDC _dc)
 
 	m_pCurScene->Render(_dc);
 	
-	
-
 	BitBlt(temp.hdc, 0, 0, temp.width, temp.height, _dc, 0, 0, SRCCOPY);
 }

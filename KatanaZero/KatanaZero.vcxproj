@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CAnimal.h" />
     <ClInclude Include="CAnimation.h" />
     <ClInclude Include="CAnimator.h" />
     <ClInclude Include="CBlood.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="CDustcloud.h" />
     <ClInclude Include="CDustcloudEmitor.h" />
     <ClInclude Include="CEffect.h" />
+    <ClInclude Include="CEffectMgr.h" />
     <ClInclude Include="CFloorCeiling.h" />
     <ClInclude Include="CCollider.h" />
     <ClInclude Include="CColliderMgr.h" />
@@ -180,6 +182,8 @@
     <ClInclude Include="CJumpCloudRight.h" />
     <ClInclude Include="CLandCloud.h" />
     <ClInclude Include="CLaser.h" />
+    <ClInclude Include="CLaserParticle.h" />
+    <ClInclude Include="CLaserparticleEmitor.h" />
     <ClInclude Include="CLineCollider.h" />
     <ClInclude Include="CMap.h" />
     <ClInclude Include="CNodeMgr.h" />
@@ -190,6 +194,7 @@
     <ClInclude Include="CParticle.h" />
     <ClInclude Include="CParticleEmitor.h" />
     <ClInclude Include="CPomp.h" />
+    <ClInclude Include="CPompStick.h" />
     <ClInclude Include="CRigidBody.h" />
     <ClInclude Include="CScene_Tool.h" />
     <ClInclude Include="CStair.h" />
@@ -224,6 +229,7 @@
     <ClInclude Include="TimeMgr.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CAnimal.cpp" />
     <ClCompile Include="CAnimation.cpp" />
     <ClCompile Include="CAnimator.cpp" />
     <ClCompile Include="CBlood.cpp" />
@@ -238,6 +244,7 @@
     <ClCompile Include="CDustcloud.cpp" />
     <ClCompile Include="CDustcloudEmitor.cpp" />
     <ClCompile Include="CEffect.cpp" />
+    <ClCompile Include="CEffectMgr.cpp" />
     <ClCompile Include="CFloorCeiling.cpp" />
     <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="CColliderMgr.cpp" />
@@ -254,6 +261,8 @@
     <ClCompile Include="CJumpCloudRight.cpp" />
     <ClCompile Include="CLandCloud.cpp" />
     <ClCompile Include="CLaser.cpp" />
+    <ClCompile Include="CLaserParticle.cpp" />
+    <ClCompile Include="CLaserparticleEmitor.cpp" />
     <ClCompile Include="CLineCollider.cpp" />
     <ClCompile Include="CMap.cpp" />
     <ClCompile Include="CNodeMgr.cpp" />
@@ -264,6 +273,7 @@
     <ClCompile Include="CParticle.cpp" />
     <ClCompile Include="CParticleEmitor.cpp" />
     <ClCompile Include="CPomp.cpp" />
+    <ClCompile Include="CPompStick.cpp" />
     <ClCompile Include="CRigidBody.cpp" />
     <ClCompile Include="CScene_Tool.cpp" />
     <ClCompile Include="CStair.cpp" />

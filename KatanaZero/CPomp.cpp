@@ -12,12 +12,13 @@
 #include "KeyMgr.h"
 #include "TimeMgr.h"
 #include "CEventMgr.h"
+#include "CPompStick.h"
 
 CPomp::CPomp()
 {
 	RoamingDistance = 300;
 	DetectAngle = 30;
-	DetectRange = 400;
+	DetectRange = 600;
 	EyeOffset = doublepoint{ 0,-20 };
 }
 
@@ -28,35 +29,38 @@ CPomp::~CPomp()
 void CPomp::Initialize()
 {
 	CMonster::Initialize();
-	CreateAnimator();
+	
 	CreateCollider(doublepoint{ 0,10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_idle\\right", L"PompIdleRight", doublepoint{ 0,0 }, doublepoint{ 33,42 }, 8, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_idle\\left", L"PompIdleLeft", doublepoint{ 0,0 }, doublepoint{ 33,42 }, 8, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_idle\\right", L"PompIdleRight", doublepoint{ 0,0 }, doublepoint{ 33,42 }, 8, 0.07, true, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_idle\\left", L"PompIdleLeft", doublepoint{ 0,0 }, doublepoint{ 33,42 }, 8, 0.07, true, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_walk\\right", L"PompWalkRight", doublepoint{ 0,0 }, doublepoint{ 31,43 }, 10, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_walk\\left", L"PompWalkLeft", doublepoint{ 0,0 }, doublepoint{ 31,43 }, 10, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_walk\\right", L"PompWalkRight", doublepoint{ 0,0 }, doublepoint{ 31,43 }, 10, 0.07, true, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_walk\\left", L"PompWalkLeft", doublepoint{ 0,0 }, doublepoint{ 31,43 }, 10, 0.07, true, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_run\\right", L"PompRunRight", doublepoint{ 0,0 }, doublepoint{ 33,40 }, 10, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_run\\left", L"PompRunLeft", doublepoint{ 0,0 }, doublepoint{ 33,40 }, 10, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_run\\right", L"PompRunRight", doublepoint{ 0,0 }, doublepoint{ 33,40 }, 10, 0.07, true, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_run\\left", L"PompRunLeft", doublepoint{ 0,0 }, doublepoint{ 33,40 }, 10, 0.07, true, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_turn\\right", L"PompTurnRight", doublepoint{ 0,0 }, doublepoint{ 37,43 }, 6, 0.1, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_turn\\left", L"PompTurnLeft", doublepoint{ 0,0 }, doublepoint{ 37,43 }, 6, 0.1, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_turn\\right", L"PompTurnRight", doublepoint{ 0,0 }, doublepoint{ 37,43 }, 6, 0.1, false, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_turn\\left", L"PompTurnLeft", doublepoint{ 0,0 }, doublepoint{ 37,43 }, 6, 0.1, false, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_attack\\right", L"PompAttackRight", doublepoint{ 0,0 }, doublepoint{ 46,43 }, 6, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_attack\\left", L"PompAttackLeft", doublepoint{ 0,0 }, doublepoint{ 46,43 }, 6, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_attack\\right", L"PompAttackRight", doublepoint{ 0,0 }, doublepoint{ 46,43 }, 6, 0.04, false, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_attack\\left", L"PompAttackLeft", doublepoint{ 0,0 }, doublepoint{ 46,43 }, 6, 0.04, false, doublepoint{ 0,-10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtfly\\right", L"PompHurtflyRight", doublepoint{ 0,0 }, doublepoint{ 41,35 }, 2, 0.07, false);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtfly\\left", L"PompHurtflyLeft", doublepoint{ 0,0 }, doublepoint{ 41,35 }, 2, 0.07, false);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtground\\right", L"PompHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 54,42 }, 15, 0.1, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtground\\left", L"PompHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 54,42 }, 15, 0.1, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtground\\right", L"PompHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 54,42 }, 15, 0.1, false, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_hurtground\\left", L"PompHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 54,42 }, 15, 0.1, false, doublepoint{ 0,-10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_fall\\right", L"PompFallRight", doublepoint{ 0,0 }, doublepoint{ 41,35 }, 13, 0.04, true);
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_fall\\left", L"PompFallLeft", doublepoint{ 0,0 }, doublepoint{ 41,35 }, 13, 0.04, true);
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_lean\\right", L"PompLeanRight", doublepoint{ 0,0 }, doublepoint{ 17,42 }, 1, 0.04, true, doublepoint{ scaleA * 5,0 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_lean\\left", L"PompLeanLeft", doublepoint{ 0,0 }, doublepoint{ 17,42 }, 1, 0.04, true, doublepoint{ -scaleA * 5,0 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_lean\\right", L"PompLeanRight", doublepoint{ 0,0 }, doublepoint{ 17,42 }, 1, 0.04, true, doublepoint{ scaleA * 5,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_lean\\left", L"PompLeanLeft", doublepoint{ 0,0 }, doublepoint{ 17,42 }, 1, 0.04, true, doublepoint{ -scaleA * 5,-10 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_knockdown\\right", L"PompKnockDownRight", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 22, 0.07, false, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_knockdown\\left", L"PompKnockDownLeft", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 22, 0.07, false, doublepoint{ 0,-10 });
 
 	//==============================================================================================================================================================
 	//이벤트 지정
@@ -93,7 +97,11 @@ void CPomp::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompAttackLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"PompIdleLeft");
 
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PompKnockDownRight")->m_CompleteEvent = std::bind(&CMonster::SetMainOrder, this, Main_Order::PlayerDetected);
 
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PompKnockDownLeft")->m_CompleteEvent = std::bind(&CMonster::SetMainOrder, this, Main_Order::PlayerDetected);
 	//=====================================================================================================================
 	//애니메이션에 맞는 피격 효과 설정 (피)
 	//=====================================================================================================================
@@ -400,7 +408,7 @@ void CPomp::Update()
 	}
 
 	doublepoint diff = (player->GetPos() - Pos);              // 공격수행 조건
-	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 80 && diff.x * LookDirection >= 0)
+	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 150 && diff.x * LookDirection >= 0)
 	{
 		if (LookDirection == Right)
 			ActionOrder = Action_Order::AttackRight;
@@ -410,19 +418,19 @@ void CPomp::Update()
 	}
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompAttackRight"
-		&& MainOrder != Main_Order::GetHurt)   // 피격시가 아니라면 공격은 무조건 마무리
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 공격은 무조건 마무리
 		ActionOrder = Action_Order::AttackRight;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompAttackLeft"
-		&& MainOrder != Main_Order::GetHurt)
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)
 		ActionOrder = Action_Order::AttackLeft;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompTurnRight"
-		&& MainOrder != Main_Order::GetHurt)   // 피격시가 아니라면 턴동작은 무조건 마무리
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 턴동작은 무조건 마무리
 		ActionOrder = Action_Order::TurnRight;
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompTurnLeft"
-		&& MainOrder != Main_Order::GetHurt)
+		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)
 		ActionOrder = Action_Order::TurnLeft;
 
 	if (ActionOrder == Action_Order::RunLeft && (OnWall || OnDoor)) // 벽에 붙었으면 서있기
@@ -688,6 +696,16 @@ void CPomp::Update()
 	}
 	break;
 
+	case Action_Order::Stun:
+	{
+		if(LookDirection == Left)
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompKnockDownLeft");
+
+		if (LookDirection == Right)
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompKnockDownRight");
+	}
+	break;
+
 	}
 }
 
@@ -698,4 +716,12 @@ void CPomp::Render(HDC _dc)
 
 void CPomp::Slash(int dir)
 {
+	CPompStick* stick = new CPompStick;
+
+	stick->Direction = dir;
+
+	stick->Owner = this;
+	stick->Initialize();
+
+	CEventMgr::Create()->Event_CreateObj(stick, GROUP_TYPE::MONSTER_PROJECTILE);
 }

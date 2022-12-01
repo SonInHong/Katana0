@@ -25,3 +25,7 @@ void CComponent::Update()
 void CComponent::Render(HDC _dc)
 {
 }
+
+void CComponent::ReRender(HDC _dc)
+{
+}

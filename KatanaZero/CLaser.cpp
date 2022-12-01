@@ -84,7 +84,7 @@ bool CLaser::Collide(CObject* other)
 
         CPlayer* ply = dynamic_cast<CPlayer*>(other);
 
-        if (ply && ply->GetRoll()==0)
+        if (ply && ply->GetUnbeatable() == false)
         {
             ply->SetMainOrder(Main_Order::GetBurn);
         }

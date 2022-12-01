@@ -11,7 +11,8 @@
 #include "Resource.h"
 #include "CUIMgr.h"
 #include "PenMgr.h"
-
+#include "CEffectMgr.h"
+#include "CScene.h"
 
 CCore::CCore()
 	:A_WindowData{}
@@ -56,8 +57,9 @@ void CCore::Initialize(WindowData windowdata, WindowData _ToolwindowData)
 	CSceneMgr::Create()->Initialize();
 	CColliderMgr::Create()->Initialize();
 	CCameraMgr::Create()->Initialize();
+	CEffectMgr::Create()->Initialize();
 
-
+	CSceneMgr::Create()->GetCurScene()->Enter();
 
 }
 

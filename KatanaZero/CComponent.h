@@ -10,6 +10,7 @@ public:
 	virtual void Initialize(CObject* p);
 	virtual void Update();
 	virtual void Render(HDC _dc);
+	virtual void ReRender(HDC _dc);
 	UINT GetID() { return ID; }
 
 	CObject* GetOwner() { return Owner; }

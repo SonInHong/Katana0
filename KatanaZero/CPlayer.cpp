@@ -22,13 +22,16 @@
 #include "CLandCloud.h"
 #include "CDoorBreaker.h"
 #include "CBloodEmitor.h"
+#include "CEffectMgr.h"
+#include "CLaserparticleEmitor.h"
 
 #define Right 1
 #define Left -1
 #define JumpVelocity -scaleA*550
 #define Animator0 dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 #define Animator1 dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])
-#define AttackSpeed 0.1
+#define AttackSpeed 0.0
+#define StunTime 0.5
 
 CPlayer::CPlayer()
 	:Texture(nullptr)
@@ -38,22 +41,330 @@ CPlayer::CPlayer()
 	,AttackOnAir(false)
 	,AttackTimer(AttackSpeed+1)
 	, AttackTimerSwitch(false)
-	, RollDustcloud(nullptr)
-	, RunDustcloud(nullptr)
-	, WallDustcloud(nullptr)
 	,PlayerDead(false)
-	,JumpCloudRight(nullptr)
-	,JumpCloudLeft(nullptr)
-	,MainOrder(Main_Order::End)
 	,burn(false)
 	,Rolling(false)
 	, PlayerSword(nullptr)
+	, Unbeatable(false)
+	,StunTimer(StunTime)
+	, Stunned(false)
+	,MP(100)
 {
+	MainOrder = Main_Order::End;
 }
 
 CPlayer::~CPlayer()
 {
 
+}
+
+void CPlayer::Initialize()
+{
+	//충돌체
+	CreateCollider(doublepoint{ 0,7 });
+
+	//dynamic_cast<CCollider*>(m_Component[(UINT)COMPONENT_TYPE::COLLIDER][0])->SetOffSet(doublepoint{ 0,7 });
+
+	//애니메이터
+	CreateAnimator();
+	CreateAnimator();  // 칼 애니메이션용 애니메이터
+	CreateAnimator(); // UI용 애니메이터
+	CreateRigidBody();
+
+	//CResourceMgr::Create()->MakeSpriteSheet(L"Player\\spr_idle", L"PlayerIdle");
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\right", L"IdleRight", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 11, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\left", L"IdleLeft", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.07, true);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\right", L"IdleToRunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\left", L"IdleToRunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\right", L"RollToRunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\left", L"RollToRunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run\\right", L"RunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 10, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run\\left", L"RunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 10, 0.07, true);
+
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run_to_idle\\right", L"RunToIdleRight", doublepoint{ 0,0 }, doublepoint{ 52,36 }, 5, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run_to_idle\\left", L"RunToIdleLeft", doublepoint{ 0,0 }, doublepoint{ 52,36 }, 5, 0.07, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_attack\\right", L"AttackRight", doublepoint{ 0,0 }, doublepoint{ 62,42 }, 7, 0.03, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_attack\\left", L"AttackLeft", doublepoint{ 0,0 }, doublepoint{ 62,42 }, 7, 0.03, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_jump\\right", L"JumpRight", doublepoint{ 0,0 }, doublepoint{ 32,42 }, 4, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_jump\\left", L"JumpLeft", doublepoint{ 0,0 }, doublepoint{ 32,42 }, 4, 0.07, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\right", L"FallRight", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\left", L"FallLeft", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\right", L"LandRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\left", L"LandLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\right", L"PreCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\left", L"PreCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\right", L"PostCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\left", L"PostCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\right", L"CrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\left", L"CrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\right", L"WallGrabRight", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\left", L"WallGrabLeft", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_roll\\right", L"RollRight", doublepoint{ 0,0 }, doublepoint{ 48,33 }, 7, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_roll\\left", L"RollLeft", doublepoint{ 0,0 }, doublepoint{ 48,33 }, 7, 0.04, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_player_flip\\right", L"FlipRight", doublepoint{ 0,0 }, doublepoint{ 50,45 }, 11, 0.02, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_player_flip\\left", L"FlipLeft", doublepoint{ 0,0 }, doublepoint{ 50,45 }, 11, 0.02, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_doorbreak\\right", L"DoorBreakRight", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 6, 0.07, false
+		, doublepoint{ 0,-10 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_doorbreak\\left", L"DoorBreakLeft", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 6, 0.07, false
+		, doublepoint{ 0,-10 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_begin\\right", L"HurtFlyBeginRight", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 2, 0.07, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_begin\\left", L"HurtFlyBeginLeft", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 2, 0.07, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\right", L"HurtFlyLoopRight", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\left", L"HurtFlyLoopLeft", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\right", L"HurtGroundRight", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{ 0,scaleA * 10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\left", L"HurtGroundLeft", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{ 0,scaleA * 10 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"IdleToRunRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"IdleToRunLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollToRunRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollToRunLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PreCrouchRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"CrouchRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PreCrouchLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"CrouchLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RunToIdleRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RunToIdleLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunToIdleRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunToIdleLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackRight")->m_CompleteEvent = std::bind(&CRigidBody::SetAttack, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetAttack, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"JumpRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"JumpLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"LandRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"LandLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PostCrouchRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PostCrouchLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RollToRunRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollRight")->m_CompleteEvent = std::bind(&CRigidBody::SetRoll, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RollToRunLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetRoll, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetFlip, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipRight")->m_CompleteEvent = std::bind(&CRigidBody::SetFlip, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"DoorBreakRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"DoorBreakLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
+
+	//벽에 붙으면 y축 속도를 죽인다
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"WallGrabLeft")->m_StartEvent = std::bind(&CRigidBody::StartWallGrab, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]));
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"WallGrabRight")->m_StartEvent = std::bind(&CRigidBody::StartWallGrab, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]));
+
+
+	//잔상효과
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackRight")->AfterImageOn(PenColor::SKY);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"AttackLeft")->AfterImageOn(PenColor::SKY);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipRight")->AfterImageOn(PenColor::SKY);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"FlipLeft")->AfterImageOn(PenColor::SKY);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollRight")->AfterImageOn(PenColor::SKY);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"RollLeft")->AfterImageOn(PenColor::SKY);
+
+	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateAnimation(CResourceMgr::Create()->Find<CTexture>(L"PlayerIdle"), L"Idle", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.1, true);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"HurtFlyBeginLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"HurtFlyLoopLeft");
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"HurtFlyBeginRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"HurtFlyLoopRight");
+
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"IdleRight");
+	LookDirection = Right;
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
+
+
+
+	//=========================
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"IdleToRunRight")->m_CompleteEvent = std::bind(&CPlayer::SetRunDustcloudOption, this, 20, doublepoint{ 2,2 }, doublepoint{ 170,210 }, doublepoint{ 150,200 },  //출발 구름 
+			doublepoint{ 0.1,0.5 }, doublepoint{ 0.005,0.01 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"IdleToRunLeft")->m_CompleteEvent = std::bind(&CPlayer::SetRunDustcloudOption, this, 20, doublepoint{ 2,2 }, doublepoint{ -30,10 }, doublepoint{ 150,200 },
+			doublepoint{ 0.1,0.5 }, doublepoint{ 0.005,0.01 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
+
+	//==================================
+
+	// 칼
+	PlayerSword = new CSword;
+	PlayerSword->Owner = this;
+	PlayerSword->SetResize(doublepoint{ 1.5,1.5 });
+	PlayerSword->SetValid(false);
+	CEventMgr::Create()->Event_CreateObj(PlayerSword, GROUP_TYPE::PLAYER_PROJECTILE);
+
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\0", L"SlashRight0", doublepoint{ 0,0 }, doublepoint{ 106,32 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\10", L"SlashRight10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-10", L"SlashRight-10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\20", L"SlashRight20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-20", L"SlashRight-20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\30", L"SlashRight30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-30", L"SlashRight-30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\40", L"SlashRight40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-40", L"SlashRight-40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\50", L"SlashRight50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-50", L"SlashRight-50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\60", L"SlashRight60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-60", L"SlashRight-60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\70", L"SlashRight70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-70", L"SlashRight-70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\80", L"SlashRight80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-80", L"SlashRight-80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\90", L"SlashRight90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-90", L"SlashRight-90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
+
+
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\0", L"SlashLeft0", doublepoint{ 0,0 }, doublepoint{ 106,32 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\10", L"SlashLeft10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-10", L"SlashLeft-10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\20", L"SlashLeft20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-20", L"SlashLeft-20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\30", L"SlashLeft30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-30", L"SlashLeft-30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\40", L"SlashLeft40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-40", L"SlashLeft-40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\50", L"SlashLeft50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-50", L"SlashLeft-50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\60", L"SlashLeft60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-60", L"SlashLeft-60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\70", L"SlashLeft70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-70", L"SlashLeft-70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\80", L"SlashLeft80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-80", L"SlashLeft-80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\90", L"SlashLeft90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-90", L"SlashLeft-90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight0")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft0")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
+
+
+	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashRight-20");
+
+	CAnimal::Initialize();
 }
 
 void CPlayer::GetInput()
@@ -117,6 +428,20 @@ void CPlayer::GetInput()
 //여기에 피격 애니메이션 로직 설정
 	//=========================================================================================
 
+	if (Stunned)
+	{
+		StunTimer -= TimeMgr::Create()->dt();
+		KeyMgr::Create()->DontGetInput();
+
+		if (StunTimer < 0)
+		{
+			StunTimer = StunTime;
+			Stunned = false;
+		}
+
+		return;
+	}
+
 	if (MainOrder == Main_Order::GetBurn)
 	{
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->BurnAnimation();
@@ -127,8 +452,25 @@ void CPlayer::GetInput()
 		PlayerDead = true;
 		burn = true;
 
+		SetBloodEmitor(false);
+		if(lasoremitorcount<1)
+			SetLaserParticleOption(doublepoint{ 1,1 }, doublepoint{ 190,350 }, doublepoint{ 70,500 }, doublepoint{ 0.3,1 }, doublepoint{ 0.001,0.01 }, doublepoint{ -10,10 }, doublepoint{ 0,0 });
+
+		lasoremitorcount++;
+
 		return;
 		
+
+	}
+
+	if (MainOrder == Main_Order::Dead)
+	{
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().x = 0;
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().y = 0;
+		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->SetGravity(false);
+
+		PlayerDead = true;
+		return;
 	}
 
 	if ((OnGround || OnStair) && Animator0->GetCurAnimation()->GetName() == L"HurtFlyLoopRight")
@@ -192,7 +534,9 @@ void CPlayer::GetInput()
 
 				//착지 이펙트 필요
 
-				LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize*scaleA *1.3 );
+
+				CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+				
 			}
 
 		}
@@ -210,7 +554,8 @@ void CPlayer::GetInput()
 				WallGrab = 0;
 
 				//착지 이펙트 필요
-				LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize * scaleA *1.3);
+				CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+
 			}
 		}
 	}
@@ -335,7 +680,7 @@ void CPlayer::GetInput()
 						Run = true;
 					}
 					
-					if (OnDoor)
+					if (OnDoor == Right)
 					{
 						SmashDoor();
 					}
@@ -419,7 +764,7 @@ void CPlayer::GetInput()
 						Run = true;
 					}
 
-					if (OnDoor)
+					if (OnDoor == Left)
 					{
 						SmashDoor();
 					}
@@ -575,7 +920,6 @@ void CPlayer::GetInput()
 
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-			//velocity.y += JumpVelocity;
 
 			velocity.y = JumpVelocity;
 
@@ -586,8 +930,8 @@ void CPlayer::GetInput()
 			OnStair = 0;
 
 			//점프 이펙트 필요
+			CEffectMgr::Create()->JumpCloud->Play(Pos + doublepoint{ 0,0 }, Resize* scaleA * 1.3);
 
-			JumpCloud->Play(Pos + doublepoint{ 0,0 }, Resize * scaleA*1.3);
 
 		}
 
@@ -698,7 +1042,9 @@ void CPlayer::GetInput()
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+			CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+
+			
 		}
 
 		else
@@ -714,7 +1060,8 @@ void CPlayer::GetInput()
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipRight");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				JumpCloudRight->Play(Pos + doublepoint{ 20,0 }, Resize* scaleA*1.3);
+				CEffectMgr::Create()->JumpCloudRight->Play(Pos + doublepoint{ 20,0 }, Resize* scaleA * 1.3);
+				
 			}
 
 if (KeyMgr::Create()->key(Key::D).pressed)
@@ -746,7 +1093,8 @@ TimeMgr::Create()->EndStopWatch();
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+			CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+
 		}
 
 		else
@@ -762,7 +1110,8 @@ TimeMgr::Create()->EndStopWatch();
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipLeft");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				JumpCloudLeft->Play(Pos + doublepoint{ -20,0 }, Resize* scaleA*1.3);
+				CEffectMgr::Create()->JumpCloudLeft->Play(Pos + doublepoint{ -20,0 }, Resize* scaleA * 1.3);
+				
 			}
 
 			if (KeyMgr::Create()->key(Key::A).pressed)
@@ -863,359 +1212,29 @@ void CPlayer::ManageEffector()
 
 }
 
-void CPlayer::Initialize()
-{
-	//충돌체
-	CreateCollider(doublepoint{ 0,7 });
 
-	//dynamic_cast<CCollider*>(m_Component[(UINT)COMPONENT_TYPE::COLLIDER][0])->SetOffSet(doublepoint{ 0,7 });
-
-	//애니메이터
-	CreateAnimator();
-	CreateAnimator();  // 칼 애니메이션용 애니메이터
-	CreateRigidBody();
-
-	//CResourceMgr::Create()->MakeSpriteSheet(L"Player\\spr_idle", L"PlayerIdle");
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\right", L"IdleRight", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 11, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle\\left", L"IdleLeft", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.07, true);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\right", L"IdleToRunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\left", L"IdleToRunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\right", L"RollToRunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_idle_to_run\\left", L"RollToRunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 4, 0.04, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run\\right", L"RunRight", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 10, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run\\left", L"RunLeft", doublepoint{ 0,0 }, doublepoint{ 44,32 }, 10, 0.07, true);
-
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run_to_idle\\right", L"RunToIdleRight", doublepoint{ 0,0 }, doublepoint{ 52,36 }, 5, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_run_to_idle\\left", L"RunToIdleLeft", doublepoint{ 0,0 }, doublepoint{ 52,36 }, 5, 0.07, false);
-	
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_attack\\right", L"AttackRight", doublepoint{ 0,0 }, doublepoint{ 62,42 }, 7, 0.03, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_attack\\left", L"AttackLeft", doublepoint{ 0,0 }, doublepoint{ 62,42 }, 7, 0.03, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_jump\\right", L"JumpRight", doublepoint{ 0,0 }, doublepoint{ 32,42 }, 4, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_jump\\left", L"JumpLeft", doublepoint{ 0,0 }, doublepoint{ 32,42 }, 4, 0.07, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\right", L"FallRight", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_fall\\left", L"FallLeft", doublepoint{ 0,0 }, doublepoint{ 42,48 }, 4, 0.07, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\right", L"LandRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_land\\left", L"LandLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 5, 0.07, false, doublepoint{ 0,-5 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\right", L"PreCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false,doublepoint{0,-5});
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_precrouch\\left", L"PreCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\right", L"PostCrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_postcrouch\\left", L"PostCrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 2, 0.07, false, doublepoint{ 0,-5 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\right", L"CrouchRight", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_crouch\\left", L"CrouchLeft", doublepoint{ 0,0 }, doublepoint{ 36,40 }, 1, 0.07, true, doublepoint{ 0,-5 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\right", L"WallGrabRight", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_wallslide\\left", L"WallGrabLeft", doublepoint{ 0,0 }, doublepoint{ 46,42 }, 1, 0.07, true);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_roll\\right", L"RollRight", doublepoint{ 0,0 }, doublepoint{ 48,33 }, 7, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_roll\\left", L"RollLeft", doublepoint{ 0,0 }, doublepoint{ 48,33 }, 7, 0.04, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_player_flip\\right", L"FlipRight", doublepoint{ 0,0 }, doublepoint{ 50,45 }, 11, 0.02, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_player_flip\\left", L"FlipLeft", doublepoint{ 0,0 }, doublepoint{ 50,45 }, 11, 0.02, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_doorbreak\\right", L"DoorBreakRight", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 6, 0.07, false 
-		, doublepoint {0,-10});
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_doorbreak\\left", L"DoorBreakLeft", doublepoint{ 0,0 }, doublepoint{ 50,44 }, 6, 0.07, false
-		, doublepoint{ 0,-10 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_begin\\right", L"HurtFlyBeginRight", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 2, 0.07, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_begin\\left", L"HurtFlyBeginLeft", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 2, 0.07, false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\right", L"HurtFlyLoopRight", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtfly_loop\\left", L"HurtFlyLoopLeft", doublepoint{ 0,0 }, doublepoint{ 50,43 }, 4, 0.07, true);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\right", L"HurtGroundRight", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{0,scaleA * 10});
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Player\\spr_hurtground\\left", L"HurtGroundLeft", doublepoint{ 0,0 }, doublepoint{ 57,25 }, 6, 0.07, false, doublepoint{ 0,scaleA * 10 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"IdleToRunRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"IdleToRunLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollToRunRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollToRunLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PreCrouchRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"CrouchRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PreCrouchLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"CrouchLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RunToIdleRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RunToIdleLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunToIdleRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RunToIdleLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackRight")->m_CompleteEvent = std::bind(&CRigidBody::SetAttack, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]),false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetAttack, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]),false);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"JumpRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"JumpLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"LandRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"LandLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PostCrouchRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PostCrouchLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RollToRunRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollRight")->m_CompleteEvent = std::bind(&CRigidBody::SetRoll, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"RollToRunLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetRoll, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipLeft")->m_CompleteEvent = std::bind(&CRigidBody::SetFlip, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"FallRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipRight")->m_CompleteEvent = std::bind(&CRigidBody::SetFlip, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]), 0);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"DoorBreakRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleRight");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"DoorBreakLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"IdleLeft");
-
-	//벽에 붙으면 y축 속도를 죽인다
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"WallGrabLeft")->m_StartEvent = std::bind(&CRigidBody::StartWallGrab, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]));
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"WallGrabRight")->m_StartEvent = std::bind(&CRigidBody::StartWallGrab, dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0]));
-
-
-	//잔상효과
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackRight")->AfterImageOn(PenColor::SKY);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"AttackLeft")->AfterImageOn(PenColor::SKY);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipRight")->AfterImageOn(PenColor::SKY);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"FlipLeft")->AfterImageOn(PenColor::SKY);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollRight")->AfterImageOn(PenColor::SKY);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"RollLeft")->AfterImageOn(PenColor::SKY);
-		
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateAnimation(CResourceMgr::Create()->Find<CTexture>(L"PlayerIdle"), L"Idle", doublepoint{ 0,0 }, doublepoint{ 36,35 }, 10, 0.1, true);
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"HurtFlyBeginLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"HurtFlyLoopLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"HurtFlyBeginRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"HurtFlyLoopRight");
-
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"IdleRight");
-	LookDirection = Right;
-	
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
-
-	
-	RollDustcloud = new CDustcloudEmitor; //구르기 구름
-	RollDustcloud->SetOwner(this);
-	RollDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
-	RollDustcloud->SetOnOff(false);
-	RollDustcloud->Initialize();
-
-	RunDustcloud = new CDustcloudEmitor; //출발 구름
-	RunDustcloud->SetOwner(this);
-	RunDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
-	RunDustcloud->SetOnOff(false);
-	RunDustcloud->Initialize();
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"IdleToRunRight")->m_CompleteEvent = std::bind(&CPlayer::SetRunDustcloudOption, this , 20, doublepoint{ 2,2 }, doublepoint{ 170,210 }, doublepoint{ 150,200 },  //출발 구름 
-			doublepoint{ 0.1,0.5 }, doublepoint{ 0.005,0.01 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"IdleToRunLeft")->m_CompleteEvent = std::bind(&CPlayer::SetRunDustcloudOption, this, 20, doublepoint{ 2,2 }, doublepoint{ -30,10 }, doublepoint{ 150,200 },
-			doublepoint{ 0.1,0.5 }, doublepoint{ 0.005,0.01 }, doublepoint{ 0,0 }, doublepoint{ -20,0 });
-
-	WallDustcloud = new CDustcloudEmitor; //출발 구름
-	WallDustcloud->SetOwner(this);
-	WallDustcloud->SetOffset(doublepoint{ 0,scaleA * 25 });
-	WallDustcloud->SetOnOff(false);
-
-
-	WallDustcloud->Initialize(); //씬에서 매번 수행되어야 하는 기능
-	
-	JumpCloud = new CJumpCloud;
-	JumpCloud->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloud, GROUP_TYPE::FINALEFFECT);
-
-	LandCloud = new CLandCloud;
-	LandCloud->Initialize();
-	CEventMgr::Create()->Event_CreateObj(LandCloud, GROUP_TYPE::FINALEFFECT);
-
-	JumpCloudRight = new CJumpCloudRight;
-	JumpCloudRight->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloudRight, GROUP_TYPE::FINALEFFECT);
-
-	JumpCloudLeft = new CJumpCloudLeft;
-	JumpCloudLeft->Initialize();
-	CEventMgr::Create()->Event_CreateObj(JumpCloudLeft, GROUP_TYPE::FINALEFFECT);
-
-	// 칼
-	PlayerSword = new CSword;
-	PlayerSword->Owner = this;
-	PlayerSword->SetResize(doublepoint{ 1.5,1.5 });
-	PlayerSword->SetValid(false);
-	CEventMgr::Create()->Event_CreateObj(PlayerSword, GROUP_TYPE::PLAYER_PROJECTILE);
-
-	
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\0", L"SlashRight0", doublepoint{ 0,0 }, doublepoint{ 106,32 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\10", L"SlashRight10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-10", L"SlashRight-10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\20", L"SlashRight20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-20", L"SlashRight-20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\30", L"SlashRight30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-30", L"SlashRight-30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\40", L"SlashRight40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-40", L"SlashRight-40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\50", L"SlashRight50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-50", L"SlashRight-50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\60", L"SlashRight60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-60", L"SlashRight-60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\70", L"SlashRight70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-70", L"SlashRight-70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\80", L"SlashRight80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-80", L"SlashRight-80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\90", L"SlashRight90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\right\\-90", L"SlashRight-90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
-	
-	
-	
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\0", L"SlashLeft0", doublepoint{ 0,0 }, doublepoint{ 106,32 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\10", L"SlashLeft10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-10", L"SlashLeft-10", doublepoint{ 0,0 }, doublepoint{ 110,50 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\20", L"SlashLeft20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-20", L"SlashLeft-20", doublepoint{ 0,0 }, doublepoint{ 118,69 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\30", L"SlashLeft30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-30", L"SlashLeft-30", doublepoint{ 0,0 }, doublepoint{ 129,89 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\40", L"SlashLeft40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-40", L"SlashLeft-40", doublepoint{ 0,0 }, doublepoint{ 143,111 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\50", L"SlashLeft50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-50", L"SlashLeft-50", doublepoint{ 0,0 }, doublepoint{ 161,135 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\60", L"SlashLeft60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-60", L"SlashLeft-60", doublepoint{ 0,0 }, doublepoint{ 182,161 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\70", L"SlashLeft70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-70", L"SlashLeft-70", doublepoint{ 0,0 }, doublepoint{ 208,191 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\80", L"SlashLeft80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-80", L"SlashLeft-80", doublepoint{ 0,0 }, doublepoint{ 239,225 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\90", L"SlashLeft90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->CreateSpriteAndAnimation(L"Player\\spr_slash\\left\\-90", L"SlashLeft-90", doublepoint{ 0,0 }, doublepoint{ 275,264 }, 5, 0.04, false);
-	
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-90")->m_CompleteEvent= std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight-10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight0")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashRight10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft-10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft0")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft90")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft80")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft70")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft60")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft50")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft40")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft30")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft20")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
-	
-
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashRight-20");
-}
 
 void CPlayer::Update()
 {	
 	bool& OnGround = dynamic_cast<CRigidBody*>(GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnGround();
 	int& OnStair = dynamic_cast<CRigidBody*>(GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnStair();
 
+
+	if (MP > 0 && KeyMgr::Create()->key(LSHIFT).pressed)
+	{
+		SlowOn();
+	}
+
+	else
+		SlowOff();
+
 	GetInput();
 	ManageEffector();
 
-	//CCameraMgr::Create()->SetCenter(Pos);
+	
 
 	PrevPos = Pos;
 
-	RollDustcloud->Update();
-	RunDustcloud->Update();
-	WallDustcloud->Update();
 
 	//PrevOnFloor = OnGround || OnStair;
 
@@ -1262,8 +1281,24 @@ void CPlayer::Update()
 
 		}
 	}
-	
 
+	// 무적 판정 체크
+
+	if (Animator0->GetCurAnimation()->GetName() == L"RollRight"
+		|| Animator0->GetCurAnimation()->GetName() == L"RollLeft"
+		|| Animator0->GetCurAnimation()->GetName() == L"FlipRight"
+		|| Animator0->GetCurAnimation()->GetName() == L"FlipLeft")
+	{
+		Unbeatable = true;
+	}
+	
+	else
+	{
+		Unbeatable = false;
+	}
+
+
+	CAnimal::Update();
 }
 
 void CPlayer::Render(HDC _dc)
@@ -1364,60 +1399,65 @@ void CPlayer::SlashSword(double _Angle)
 		if (sin(_Angle) >= sin((double)-5 / 180 * M_PI) && sin(_Angle) < sin((double)5 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft0");
 
-		if (sin(_Angle) >= sin((double)-15 / 180 * M_PI) && sin(_Angle) < sin((double)-5 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-15 / 180 * M_PI) && sin(_Angle) < sin((double)-5 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-10");
 
-		if (sin(_Angle) >= sin((double)-25 / 180 * M_PI) && sin(_Angle) < sin((double)-15 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-25 / 180 * M_PI) && sin(_Angle) < sin((double)-15 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-20");
 
-		if (sin(_Angle) >= sin((double)-35 / 180 * M_PI) && sin(_Angle) < sin((double)-25 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-35 / 180 * M_PI) && sin(_Angle) < sin((double)-25 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-30");
 
-		if (sin(_Angle) >= sin((double)-45 / 180 * M_PI) && sin(_Angle) < sin((double)-35 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-45 / 180 * M_PI) && sin(_Angle) < sin((double)-35 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-40");
 
-		if (sin(_Angle) >= sin((double)-55 / 180 * M_PI) && sin(_Angle) < sin((double)-45 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-55 / 180 * M_PI) && sin(_Angle) < sin((double)-45 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-50");
 
-		if (sin(_Angle) >= sin((double)-65 / 180 * M_PI) && sin(_Angle) < sin((double)-55 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-65 / 180 * M_PI) && sin(_Angle) < sin((double)-55 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-60");
 
-		if (sin(_Angle) >= sin((double)-75 / 180 * M_PI) && sin(_Angle) < sin((double)-65 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-75 / 180 * M_PI) && sin(_Angle) < sin((double)-65 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-70");
 
-		if (sin(_Angle) >= sin((double)-85 / 180 * M_PI) && sin(_Angle) < sin((double)-75 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-85 / 180 * M_PI) && sin(_Angle) < sin((double)-75 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-80");
 
-		if (sin(_Angle) >= sin((double)-90 / 180 * M_PI) && sin(_Angle) < sin((double)-85 / 180 * M_PI))
+		else if (sin(_Angle) >= sin((double)-90 / 180 * M_PI) && sin(_Angle) < sin((double)-85 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft-90");
 
 
-		if (sin(_Angle) < sin((double)15 / 180 * M_PI) && sin(_Angle) >= sin((double)5 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)15 / 180 * M_PI) && sin(_Angle) >= sin((double)5 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft10");
 
-		if (sin(_Angle) < sin((double)25 / 180 * M_PI) && sin(_Angle) >= sin((double)15 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)25 / 180 * M_PI) && sin(_Angle) >= sin((double)15 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft20");
 
-		if (sin(_Angle) < sin((double)35 / 180 * M_PI) && sin(_Angle) >= sin((double)25 / 180 * M_PI))
-			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeftt30");
+		else if (sin(_Angle) < sin((double)35 / 180 * M_PI) && sin(_Angle) >= sin((double)25 / 180 * M_PI))
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft30");
 
-		if (sin(_Angle) < sin((double)45 / 180 * M_PI) && sin(_Angle) >= sin((double)35 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)45 / 180 * M_PI) && sin(_Angle) >= sin((double)35 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft40");
 
-		if (sin(_Angle) < sin((double)55 / 180 * M_PI) && sin(_Angle) >= sin((double)45 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)55 / 180 * M_PI) && sin(_Angle) >= sin((double)45 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft50");
 
-		if (sin(_Angle) < sin((double)65 / 180 * M_PI) && sin(_Angle) >= sin((double)55 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)65 / 180 * M_PI) && sin(_Angle) >= sin((double)55 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft60");
 
-		if (sin(_Angle) < sin((double)75 / 180 * M_PI) && sin(_Angle) >= sin((double)65 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)75 / 180 * M_PI) && sin(_Angle) >= sin((double)65 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft70");
 
-		if (sin(_Angle) < sin((double)85 / 180 * M_PI) && sin(_Angle) >= sin((double)75 / 180 * M_PI))
+		else if (sin(_Angle) < sin((double)85 / 180 * M_PI) && sin(_Angle) >= sin((double)75 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft80");
 
-		if (sin(_Angle) <= sin((double)90 / 180 * M_PI) && sin(_Angle) >= sin((double)85 / 180 * M_PI))
+		else if (sin(_Angle) <= sin((double)90 / 180 * M_PI) && sin(_Angle) >= sin((double)85 / 180 * M_PI))
 			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashLeft90");
+
+		else
+		{
+			int a = 0;
+		}
 	}
 		
 }
@@ -1464,52 +1504,22 @@ void CPlayer::SmashDoor()
 
 }
 
-void CPlayer::SetRollDustcloud(bool b)
+void CPlayer::SlowOn()
 {
-	RollDustcloud->SetOnOff(b);
+	
+		TimeMgr::Create()->GetTimeScale() -= TimeMgr::Create()->realdt();
+		if (TimeMgr::Create()->GetTimeScale() < 0.5)
+			TimeMgr::Create()->GetTimeScale() = 0.5;
+
+		CCameraMgr::Create()->SetCameraRenderMode(CameraRenderMode::SubtleFadeOut);
+		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->SetReRender(true);
+	
 }
 
-void CPlayer::SetRollDustcloudOption(doublepoint resize,doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
+void CPlayer::SlowOff()
 {
-	RollDustcloud->SetOption(resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	RollDustcloud->SetOnOff(true);
-}
+	TimeMgr::Create()->GetTimeScale() = 1;
+	CCameraMgr::Create()->SetCameraRenderMode(CameraRenderMode::SubtleFadeIn);
 
-void CPlayer::SetRunDustcloud(bool b)
-{
-	RunDustcloud->SetOnOff(b);
-}
-
-void CPlayer::SetRunDustcloudOption(int maxcount, doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	RunDustcloud->SetOption(maxcount, resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	RunDustcloud->SetOnOff(true);
-}
-
-void CPlayer::SetWallDustcloud(bool b)
-{
-	WallDustcloud->SetOnOff(b);
-}
-
-void CPlayer::SetWallDustcloudOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	WallDustcloud->SetOption(resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	WallDustcloud->SetOnOff(true);
-}
-
-void CPlayer::SetBloodEmitor(bool b)
-{
-	BloodEmitor->SetOnOff(b);
-}
-
-void CPlayer::SetBloodEmitorOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	BloodEmitor->SetOption(resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	BloodEmitor->SetOnOff(true);
-}
-
-void CPlayer::SetBloodEmitormaxOption(int maxcount, doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
-{
-	BloodEmitor->SetOption(maxcount, resize, anglerange, velocityrange, durationrange, attackspeedrange, XoffRange, YoffRange);
-	BloodEmitor->SetOnOff(true);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->SetReRender(false);
 }

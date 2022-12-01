@@ -5,6 +5,8 @@
 #include "CCameraMgr.h"
 #include <functional>
 #include "PenMgr.h"
+#include "CAnimal.h"
+#include "CLaserparticleEmitor.h"
 #pragma comment(lib, "Msimg32.lib")
 
 CAnimation::CAnimation()
@@ -168,6 +170,22 @@ void CAnimation::Render(HDC _dc)
 
 		SelectObject(com_DC, PenMgr::Create()->GetSkyBrush());
 
+		//여기서 레이저파티클 이미터의 오프셋 지정
+		CAnimal* p = dynamic_cast<CAnimal*>(m_Owner->GetOwner());
+		if (p)
+		{
+			if (Burn_Yalpha > m_SpriteSize.y)
+			{
+				p->GetLaserparticleEmitor()->SetOnOff(false);
+				p->GetMainOrder() = Main_Order::Dead;
+			}
+				
+			
+			p->GetLaserparticleEmitor()->SetOffset({ OffSet.x,OffSet.y - m_SpriteSize.y * AnimationScaling.y * Resize.y / 2 + Burn_Yalpha * AnimationScaling.y * Resize.y });
+
+
+		}
+
 		return;
 
 	}
@@ -213,6 +231,47 @@ void CAnimation::Render(HDC _dc)
 
 		SelectObject(com_DC, oldbrush);
 	}
+}
+
+void CAnimation::ReRender(HDC _dc)
+{
+	doublepoint Pos = m_Owner->GetOwner()->GetPos() + OffSet;
+	doublepoint Scale = doublepoint{ (double)m_SpriteSize.x, (double)m_SpriteSize.y };
+	doublepoint Resize = m_Owner->GetOwner()->GetResize();
+	doublepoint AnimationScaling = m_Owner->GetOwner()->GetAnimationScaling();
+
+
+	if (m_Owner->GetOwner()->GetCameraONOFF() == true)
+	{
+		Pos = CCameraMgr::Create()->CameraCoordinate(Pos);
+		Scale = CCameraMgr::Create()->CameraScale(Scale);
+	}
+
+	BLENDFUNCTION func3 = {};
+	func3.AlphaFormat = AC_SRC_ALPHA;
+	func3.BlendFlags = 0;
+	func3.BlendOp = AC_SRC_OVER;
+	func3.AlphaFormat = 0;
+	func3.SourceConstantAlpha = 120;
+
+
+	HDC com_DC = CCameraMgr::Create()->GetcomDC();
+
+	SelectObject(com_DC, PenMgr::Create()->GetBrush(PenColor::AQUA));
+
+	Rectangle(com_DC, -1, -1, m_SpriteSize.x + 1, m_SpriteSize.y + 1);   // 도화지 준비
+
+	TransparentBlt(com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y
+		, m_Texture->GetDC(), m_LeftTop.x + m_SpriteSize.x * m_CurIndex, m_LeftTop.y 
+		, m_SpriteSize.x, m_SpriteSize.y, RGB(255, 255, 255));  // 그 위에 그리고
+
+	AlphaBlend(com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y
+		, CCameraMgr::Create()->GetAquaDC(), 0, 0, m_SpriteSize.x, m_SpriteSize.y, func3); // 그 위에 파란색 덫칠
+
+	TransparentBlt(_dc, Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2, Pos.y - AnimationScaling.y * Resize.y * Scale.y / 2, AnimationScaling.x * Resize.x * Scale.x, AnimationScaling.y * Resize.y * Scale.y
+		, com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y, RGB(0, 255,255));
+
+	SelectObject(com_DC, PenMgr::Create()->GetSkyBrush());
 }
 
 void CAnimation::Reset()

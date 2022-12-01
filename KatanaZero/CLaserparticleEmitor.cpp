@@ -1,0 +1,34 @@
+#include "pch.h"
+#include "CLaserparticleEmitor.h"
+#include "CLaserParticle.h"
+#include "CEventMgr.h"
+
+CLaserparticleEmitor::CLaserparticleEmitor()
+	:Owner(nullptr)
+	,OffSet{}
+{
+}
+
+CLaserparticleEmitor::~CLaserparticleEmitor()
+{
+}
+
+void CLaserparticleEmitor::Initialize()
+{
+	for (int i = 0; i < m_PoolSize; ++i)
+	{
+		CLaserParticle* _particle = new CLaserParticle;
+		_particle->Initialize();
+		CEventMgr::Create()->Event_CreateObj(_particle, GROUP_TYPE::PARTICLE);
+
+		m_Particles.push_back(_particle);
+	}
+}
+
+void CLaserparticleEmitor::Update()
+{
+	if (Owner)
+		Pos = Owner->GetPos() + OffSet;
+
+	CParticleEmitor::Update();
+}

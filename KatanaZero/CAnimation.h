@@ -40,6 +40,8 @@ public:
 
 	void Update();
 	void Render(HDC _dc);
+	void ReRender(HDC _dc);
+
 	std::wstring GetName() {
 		if (this == nullptr)
 			return L"";

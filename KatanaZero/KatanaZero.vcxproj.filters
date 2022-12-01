@@ -79,12 +79,6 @@
     <Filter Include="Engine\CScene\CScene_Start">
       <UniqueIdentifier>{7c54ec23-724d-46b2-a267-b991688b337b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\CObject\CPlayer">
-      <UniqueIdentifier>{2a41a6bf-f4c4-4c85-a4c7-a5361eb18bdd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\CObject\CMonster">
-      <UniqueIdentifier>{7794b50e-3f20-4216-a265-078ff9eb3382}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\CObject\CMap">
       <UniqueIdentifier>{bf209c12-9edb-42dd-9454-80f86db3fc5c}</UniqueIdentifier>
     </Filter>
@@ -136,12 +130,6 @@
     <Filter Include="Engine\CObject\Architecture\CFloor\CCeiling">
       <UniqueIdentifier>{f171fc79-5679-4b57-90f9-7efab7e0a0df}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\CObject\CPlayer\CSword">
-      <UniqueIdentifier>{4154fb31-8a36-4a38-99c5-88b8700eb8a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\CObject\CPlayer\CGroundBreaker">
-      <UniqueIdentifier>{3d29b59a-8c6b-4dc6-a9e5-b4d07a6253d9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\CObject\CCursor">
       <UniqueIdentifier>{81bb4796-7d92-4fdf-a1fc-1dd0e5b1f4b1}</UniqueIdentifier>
     </Filter>
@@ -150,9 +138,6 @@
     </Filter>
     <Filter Include="Engine\Managers\CNodeMgr\Node">
       <UniqueIdentifier>{eb8359e4-83c2-40a9-a46f-593ab02441b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\CObject\CMonster\CGrunt">
-      <UniqueIdentifier>{1844fd26-663d-4f93-bdc3-51fbc707262b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\CObject\CParticle">
       <UniqueIdentifier>{a4d42d84-298d-4624-a0cd-f977a3763b35}</UniqueIdentifier>
@@ -196,17 +181,11 @@
     <Filter Include="Engine\CObject\Architecture\CDoor">
       <UniqueIdentifier>{ebd251ea-eedc-4a80-b70f-f4600d00a64a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\CObject\CPlayer\CDoorBreaker">
-      <UniqueIdentifier>{3f23ceb1-e70c-42a2-8c19-1c1d6e59d02c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine\CObject\Architecture\CDoor\CNormalDoor">
       <UniqueIdentifier>{979dc1de-8506-47be-a0ef-d2981533e7ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Managers\CollideMath">
       <UniqueIdentifier>{6748f5b7-2cc8-4d55-922b-5b9398e6d5b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\CObject\CMonster\CGrunt\CGruntFist">
-      <UniqueIdentifier>{2f76f59b-7727-4320-b103-4a8b3235487c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\CObject\CTrap">
       <UniqueIdentifier>{101cb1d7-b912-4548-817b-9d30a9697e07}</UniqueIdentifier>
@@ -217,8 +196,44 @@
     <Filter Include="Engine\CObject\CEffect\HitEffect">
       <UniqueIdentifier>{5ceb2c2a-0514-4667-bced-b5534535f915}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\CObject\CMonster\CPomp">
+    <Filter Include="Engine\Managers\CEffectMgr">
+      <UniqueIdentifier>{f36a22d3-808c-4204-92c4-4584391b0d68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CParticle\CLaserparticleEmitor">
+      <UniqueIdentifier>{31c40716-1703-444b-a41a-a1cabbd4ff86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CParticle\CLaserparticleEmitor\CLaserparticle">
+      <UniqueIdentifier>{64e6498c-53a3-4484-802f-4fa1373e322b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal">
+      <UniqueIdentifier>{39845ef1-3960-4324-8796-1e16575800c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CPlayer">
+      <UniqueIdentifier>{2a41a6bf-f4c4-4c85-a4c7-a5361eb18bdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CPlayer\CSword">
+      <UniqueIdentifier>{4154fb31-8a36-4a38-99c5-88b8700eb8a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CPlayer\CGroundBreaker">
+      <UniqueIdentifier>{3d29b59a-8c6b-4dc6-a9e5-b4d07a6253d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CPlayer\CDoorBreaker">
+      <UniqueIdentifier>{3f23ceb1-e70c-42a2-8c19-1c1d6e59d02c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster">
+      <UniqueIdentifier>{7794b50e-3f20-4216-a265-078ff9eb3382}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CGrunt">
+      <UniqueIdentifier>{1844fd26-663d-4f93-bdc3-51fbc707262b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CGrunt\CGruntFist">
+      <UniqueIdentifier>{2f76f59b-7727-4320-b103-4a8b3235487c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CPomp">
       <UniqueIdentifier>{8df56f2d-3a90-4ff6-8004-4b2defe15c4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CPomp\CPompStick">
+      <UniqueIdentifier>{158f3252-c2a6-464a-986d-742af01bacb5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -295,16 +310,16 @@
       <Filter>Engine\CScene\CScene_Start</Filter>
     </ClInclude>
     <ClInclude Include="CPlayer.h">
-      <Filter>Engine\CObject\CPlayer</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer</Filter>
     </ClInclude>
     <ClInclude Include="CMonster.h">
-      <Filter>Engine\CObject\CMonster</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster</Filter>
     </ClInclude>
     <ClInclude Include="CMap.h">
       <Filter>Engine\CObject\CMap</Filter>
     </ClInclude>
     <ClInclude Include="CSword.h">
-      <Filter>Engine\CObject\CPlayer\CSword</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CSword</Filter>
     </ClInclude>
     <ClInclude Include="CUI.h">
       <Filter>Engine\CObject\CUI</Filter>
@@ -352,7 +367,7 @@
       <Filter>Engine\CObject\Architecture\CFloor\CCeiling</Filter>
     </ClInclude>
     <ClInclude Include="CGroundBreaker.h">
-      <Filter>Engine\CObject\CPlayer\CGroundBreaker</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CGroundBreaker</Filter>
     </ClInclude>
     <ClInclude Include="CCursor.h">
       <Filter>Engine\CObject\CCursor</Filter>
@@ -364,7 +379,7 @@
       <Filter>Engine\Managers\CNodeMgr</Filter>
     </ClInclude>
     <ClInclude Include="CGrunt.h">
-      <Filter>Engine\CObject\CMonster\CGrunt</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CGrunt</Filter>
     </ClInclude>
     <ClInclude Include="CParticle.h">
       <Filter>Engine\CObject\CParticle</Filter>
@@ -409,7 +424,7 @@
       <Filter>Engine\CObject\Architecture\CDoor</Filter>
     </ClInclude>
     <ClInclude Include="CDoorBreaker.h">
-      <Filter>Engine\CObject\CPlayer\CDoorBreaker</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CDoorBreaker</Filter>
     </ClInclude>
     <ClInclude Include="CNormalDoorRight.h">
       <Filter>Engine\CObject\Architecture\CDoor\CNormalDoor</Filter>
@@ -421,7 +436,7 @@
       <Filter>Engine\Managers\CollideMath</Filter>
     </ClInclude>
     <ClInclude Include="CGruntFist.h">
-      <Filter>Engine\CObject\CMonster\CGrunt\CGruntFist</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CGrunt\CGruntFist</Filter>
     </ClInclude>
     <ClInclude Include="CJumpCloudLeft.h">
       <Filter>Engine\CObject\CEffect\CJumpCloud</Filter>
@@ -436,7 +451,22 @@
       <Filter>Engine\CObject\CEffect\HitEffect</Filter>
     </ClInclude>
     <ClInclude Include="CPomp.h">
-      <Filter>Engine\CObject\CMonster\CPomp</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CPomp</Filter>
+    </ClInclude>
+    <ClInclude Include="CPompStick.h">
+      <Filter>Engine\CObject\CAnimal\CMonster\CPomp\CPompStick</Filter>
+    </ClInclude>
+    <ClInclude Include="CEffectMgr.h">
+      <Filter>Engine\Managers\CEffectMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="CLaserParticle.h">
+      <Filter>Engine\CObject\CParticle\CLaserparticleEmitor\CLaserparticle</Filter>
+    </ClInclude>
+    <ClInclude Include="CLaserparticleEmitor.h">
+      <Filter>Engine\CObject\CParticle\CLaserparticleEmitor</Filter>
+    </ClInclude>
+    <ClInclude Include="CAnimal.h">
+      <Filter>Engine\CObject\CAnimal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -501,16 +531,16 @@
       <Filter>Engine\CScene\CScene_Start</Filter>
     </ClCompile>
     <ClCompile Include="CPlayer.cpp">
-      <Filter>Engine\CObject\CPlayer</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer</Filter>
     </ClCompile>
     <ClCompile Include="CMonster.cpp">
-      <Filter>Engine\CObject\CMonster</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster</Filter>
     </ClCompile>
     <ClCompile Include="CMap.cpp">
       <Filter>Engine\CObject\CMap</Filter>
     </ClCompile>
     <ClCompile Include="CSword.cpp">
-      <Filter>Engine\CObject\CPlayer\CSword</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CSword</Filter>
     </ClCompile>
     <ClCompile Include="CUI.cpp">
       <Filter>Engine\CObject\CUI</Filter>
@@ -558,7 +588,7 @@
       <Filter>Engine\CObject\Architecture\CFloor\CCeiling</Filter>
     </ClCompile>
     <ClCompile Include="CGroundBreaker.cpp">
-      <Filter>Engine\CObject\CPlayer\CGroundBreaker</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CGroundBreaker</Filter>
     </ClCompile>
     <ClCompile Include="CCursor.cpp">
       <Filter>Engine\CObject\CCursor</Filter>
@@ -570,7 +600,7 @@
       <Filter>Engine\Managers\CNodeMgr</Filter>
     </ClCompile>
     <ClCompile Include="CGrunt.cpp">
-      <Filter>Engine\CObject\CMonster\CGrunt</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CGrunt</Filter>
     </ClCompile>
     <ClCompile Include="CParticle.cpp">
       <Filter>Engine\CObject\CParticle</Filter>
@@ -615,7 +645,7 @@
       <Filter>Engine\CObject\Architecture\CDoor</Filter>
     </ClCompile>
     <ClCompile Include="CDoorBreaker.cpp">
-      <Filter>Engine\CObject\CPlayer\CDoorBreaker</Filter>
+      <Filter>Engine\CObject\CAnimal\CPlayer\CDoorBreaker</Filter>
     </ClCompile>
     <ClCompile Include="CNormalDoorRight.cpp">
       <Filter>Engine\CObject\Architecture\CDoor\CNormalDoor</Filter>
@@ -627,7 +657,7 @@
       <Filter>Engine\Managers\CollideMath</Filter>
     </ClCompile>
     <ClCompile Include="CGruntFist.cpp">
-      <Filter>Engine\CObject\CMonster\CGrunt\CGruntFist</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CGrunt\CGruntFist</Filter>
     </ClCompile>
     <ClCompile Include="CJumpCloudLeft.cpp">
       <Filter>Engine\CObject\CEffect\CJumpCloud</Filter>
@@ -642,7 +672,22 @@
       <Filter>Engine\CObject\CEffect\HitEffect</Filter>
     </ClCompile>
     <ClCompile Include="CPomp.cpp">
-      <Filter>Engine\CObject\CMonster\CPomp</Filter>
+      <Filter>Engine\CObject\CAnimal\CMonster\CPomp</Filter>
+    </ClCompile>
+    <ClCompile Include="CPompStick.cpp">
+      <Filter>Engine\CObject\CAnimal\CMonster\CPomp\CPompStick</Filter>
+    </ClCompile>
+    <ClCompile Include="CEffectMgr.cpp">
+      <Filter>Engine\Managers\CEffectMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="CLaserParticle.cpp">
+      <Filter>Engine\CObject\CParticle\CLaserparticleEmitor\CLaserparticle</Filter>
+    </ClCompile>
+    <ClCompile Include="CLaserparticleEmitor.cpp">
+      <Filter>Engine\CObject\CParticle\CLaserparticleEmitor</Filter>
+    </ClCompile>
+    <ClCompile Include="CAnimal.cpp">
+      <Filter>Engine\CObject\CAnimal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

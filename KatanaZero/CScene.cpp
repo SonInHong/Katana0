@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "CScene.h"
 #include "CObject.h"
+#include "CCameraMgr.h"
 
 CScene::CScene()
 	:m_arrObj{}
@@ -60,6 +61,15 @@ void CScene::Render(HDC _dc)
 		}
 
 	}
+
+	CCameraMgr::Create()->Render(_dc);
+
+	
+	CObject* pla = m_arrObj[(UINT)GROUP_TYPE::PLAYER][0];
+	pla->ReRender(_dc);
+
+
+		
 }
 
 void CScene::Load(const std::wstring& Path)

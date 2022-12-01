@@ -12,6 +12,7 @@ private:
 	LARGE_INTEGER PrevTimer;
 	LARGE_INTEGER FinishTimer;
 
+	double TimeScale;
 	double delta_time;
 	int m_FPS;
 	int count;
@@ -34,7 +35,8 @@ public:
 
 	void Initialize();
 	void Update();
-	double dt() { return delta_time; }
+	double dt() { return TimeScale*delta_time; }
+	double realdt() { return delta_time; }
 
 	void StartStopWatch(double time) { m_StopWatch.time = time; m_StopWatch.OnOff = true; m_StopWatch.TimeOver = false; }
 	void EndStopWatch() { m_StopWatch.OnOff = false; }
@@ -60,5 +62,7 @@ public:
 		return ((double)FinishTimer.QuadPart - (double)PrevTimer.QuadPart) / (double)m_Frequency.QuadPart; 
 	}
 	
+	void SetTimeScale(double t) { TimeScale = t; }
+	double& GetTimeScale() { return TimeScale; }
 };
 

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "TimeMgr.h"
 #include "CCore.h"
+#include "KeyMgr.h"
+#include "CCameraMgr.h"
 
 TimeMgr::TimeMgr()
 	:m_PrevCount{}
@@ -11,6 +13,7 @@ TimeMgr::TimeMgr()
 	, count(0)
 	, TimeSum(0)
 	,m_StopWatch{0,false,false}
+	,TimeScale(1)
 {
 
 }
@@ -62,6 +65,6 @@ void TimeMgr::Update()
 		
 	}
 		
-		
+	
 
 }

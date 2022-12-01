@@ -22,6 +22,7 @@ CCameraMgr::CCameraMgr()
     ,UpperLimit(-10000)
     ,BottomLimit(10000)
     ,frametime(0)
+    ,rendermode(CameraRenderMode::NONE)
 {
 }
 
@@ -137,7 +138,7 @@ void CCameraMgr::LateUpdate()
 
         Timer += TimeMgr::Create()->dt();
 
-        OffSet = doublepoint{ 30 * shaker * cos(100 * shaker),30 * shaker * sin(100 * shaker) };
+        OffSet = doublepoint{ 100 * shaker * cos(200 * shaker),50 * shaker * sin(100 * shaker) };
 
     }
     break;
@@ -164,7 +165,7 @@ void CCameraMgr::LateUpdate()
 
         Timer += TimeMgr::Create()->dt();
 
-        OffSet = doublepoint{ 20 * shaker * cos(70 * shaker),20 * shaker * sin(70 * shaker) };
+        OffSet = doublepoint{ 40 * shaker * cos(70 * shaker),40 * shaker * sin(70 * shaker) };
 
     }
     break;
@@ -245,13 +246,13 @@ void CCameraMgr::MoveCamera()
 
 void CCameraMgr::Initialize()
 {
-    yellowDC = CreateCompatibleDC(CCore::Create()->GetToolWindowData().hdc);
-    yellowBitmap = CreateCompatibleBitmap(CCore::Create()->GetToolWindowData().hdc, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
+    yellowDC = CreateCompatibleDC(CCore::Create()->GetWindowData().hdc);
+    yellowBitmap = CreateCompatibleBitmap(CCore::Create()->GetWindowData().hdc, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
 
     SelectObject(yellowDC, yellowBitmap);
 
-    blackDC = CreateCompatibleDC(CCore::Create()->GetToolWindowData().hdc);
-    blackBitmap = CreateCompatibleBitmap(CCore::Create()->GetToolWindowData().hdc, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
+    blackDC = CreateCompatibleDC(CCore::Create()->GetWindowData().hdc);
+    blackBitmap = CreateCompatibleBitmap(CCore::Create()->GetWindowData().hdc, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
 
     SelectObject(blackDC, blackBitmap);
 
@@ -260,13 +261,56 @@ void CCameraMgr::Initialize()
 
     DeleteObject((HBRUSH)SelectObject(blackDC, GetStockObject(BLACK_BRUSH)));
 
-    Rectangle(yellowDC, -1, -1, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
-    Rectangle(blackDC, -1, -1, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
+    Rectangle(yellowDC, -1, -1, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
+    Rectangle(blackDC, -1, -1, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
 
-    comDC = CreateCompatibleDC(CCore::Create()->GetToolWindowData().hdc);
-    comBitmap = CreateCompatibleBitmap(CCore::Create()->GetToolWindowData().hdc, CCore::Create()->GetToolWindowData().width, CCore::Create()->GetToolWindowData().height);
+    comDC = CreateCompatibleDC(CCore::Create()->GetWindowData().hdc);
+    comBitmap = CreateCompatibleBitmap(CCore::Create()->GetWindowData().hdc, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
     HBITMAP temp = (HBITMAP)SelectObject(comDC, comBitmap);
     DeleteObject(temp);
     SelectObject(comDC, PenMgr::Create()->GetSkyBrush());
 
+    AquaDC = CreateCompatibleDC(CCore::Create()->GetWindowData().hdc);
+    AquaBitmap = CreateCompatibleBitmap(CCore::Create()->GetWindowData().hdc, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
+    HBITMAP temp2 = (HBITMAP)SelectObject(AquaDC, AquaBitmap);
+    DeleteObject(temp2);
+    SelectObject(AquaDC, PenMgr::Create()->GetBrush(PenColor::AQUA));
+    Rectangle(AquaDC, -1, -1, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height);
+
+}
+
+void CCameraMgr::Render(HDC _dc)
+{
+    static double t = 0;
+    
+    switch (rendermode)
+    {
+    case CameraRenderMode::SubtleFadeOut:
+    {
+        t += 2*TimeMgr::Create()->realdt();
+        if (t > 0.7)
+            t = 0.7;
+        
+    }
+    break;
+
+    case CameraRenderMode::SubtleFadeIn:
+    {
+        t -= 2*TimeMgr::Create()->realdt();
+        if (t < 0)
+            t = 0;
+    }
+    break;
+    }
+
+    BLENDFUNCTION func = {};
+    func.AlphaFormat = AC_SRC_ALPHA;
+    func.BlendFlags = 0;
+    func.BlendOp = AC_SRC_OVER;
+    func.AlphaFormat = 0;
+    func.SourceConstantAlpha = 255*t;
+
+    if(t>0)
+        AlphaBlend(_dc, 0, 0, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height, blackDC, 0, 0, CCore::Create()->GetWindowData().width, CCore::Create()->GetWindowData().height
+        , func);
 }

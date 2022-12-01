@@ -61,7 +61,7 @@ void CCollider::Render(HDC _dc)
 		
 		HBRUSH oldBrush = (HBRUSH)SelectObject(_dc, GetStockObject(NULL_BRUSH));
 
-		if (!KeyMgr::Create()->key(Key::C).pressed)
+		if (KeyMgr::Create()->key(Key::C).pressed)
 		{
 			Rectangle(_dc, CameraPos.x - CameraScale.x / 2, CameraPos.y - CameraScale.y / 2, CameraPos.x + CameraScale.x / 2, CameraPos.y + CameraScale.y / 2);
 		}

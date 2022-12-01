@@ -1,5 +1,6 @@
 #pragma once
 #include "CObject.h"
+#include "CAnimal.h"
 #include "CTexture.h"
 #include "CJumpCloudLeft.h"
 #include "CJumpCloudRight.h"
@@ -11,9 +12,10 @@ class CJumpCloud;
 class CLandCloud;
 class CBloodEmitor;
 class CSword;
+class CLaserparticleEmitor;
 
 class CPlayer :
-    public CObject
+    public CAnimal
 {
 public:
     CPlayer();
@@ -30,26 +32,16 @@ public:
     void BreakGround();
     void SmashDoor();
 
-    void SetRollDustcloud(bool b);
-    void SetRollDustcloudOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange);
-   
-    void SetRunDustcloud(bool b);
-    void SetRunDustcloudOption(int maxcount, doublepoint resize, doublepoint anglerange, 
-        doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange);
-
-    void SetWallDustcloud(bool b);
-    void SetWallDustcloudOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange);
-    
-    void SetBloodEmitor(bool b);
-    void SetBloodEmitorOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange);
-    void SetBloodEmitormaxOption(int maxcount, doublepoint resize, doublepoint anglerange
-        , doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange);
 
     void SetHurtAngle(double b) { HurtAngle = b; }
     void SetMainOrder(Main_Order m) { MainOrder = m; }
-    Main_Order& GetMainOrder() { return MainOrder; }
+    
 
     int GetRoll() { return Rolling; }
+    bool& GetUnbeatable() { return Unbeatable; }
+    void StunPlayer() { Stunned = true; }
+
+    CSword* GetSword() { return PlayerSword; }
 
 private:
     CTexture* Texture;
@@ -60,26 +52,24 @@ private:
     long double AttackTimer;
     bool AttackTimerSwitch;
 
-    CDustcloudEmitor* RollDustcloud;
-    CDustcloudEmitor* RunDustcloud;
-    CDustcloudEmitor* WallDustcloud;
-    
-
-    CBloodEmitor* BloodEmitor;
-
-    CJumpCloud* JumpCloud;
-    CLandCloud* LandCloud;
-    CJumpCloudLeft* JumpCloudLeft;
-    CJumpCloudRight* JumpCloudRight;
 
     bool burn;
     bool PlayerDead;
     double HurtAngle;
     int Rolling;
 
+    bool Unbeatable;
+    double StunTimer;
+    bool Stunned;
+
     CSword* PlayerSword;
 
-    Main_Order MainOrder;
+    double MP;
+    
+    void SlowOn();
+    void SlowOff();
+
+    
 
     
     

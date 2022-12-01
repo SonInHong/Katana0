@@ -120,6 +120,25 @@ public:
 		return keyinfo[k];
 	}
 
+	void DontGetInput()
+	{
+		
+		keyinfo[A].key_state = KeyState::NONE;
+		keyinfo[A].pressed = false;
+
+		keyinfo[D].key_state = KeyState::NONE;
+		keyinfo[D].pressed = false;
+
+		keyinfo[S].key_state = KeyState::NONE;
+		keyinfo[S].pressed = false;
+
+		keyinfo[W].key_state = KeyState::NONE;
+		keyinfo[W].pressed = false;
+
+		keyinfo[LEFTMOUSE].key_state = KeyState::NONE;
+		keyinfo[LEFTMOUSE].pressed = false;
+	}
+
 	POINT GetMousePos() { return mousePos; }
 
 	void Initialize();

@@ -68,11 +68,12 @@ enum class GROUP_TYPE
 	PARTICLE_EMITOR,
 	PARTICLE,
 	TRAP,
+	MONSTER_PROJECTILE,
 	MONSTER,
 	PLAYER,
 	
 	
-	MONSTER_PROJECTILE,
+	
 	PLAYER_PROJECTILE,
 	CENSOR,
 	FINALEFFECT,
@@ -127,6 +128,9 @@ enum class Main_Order
 	PlayerDetected,
 	GetHurt,
 	GetBurn,
+	PlayerStun,
+	MonsterStun,
+	Dead,
 	End,
 };
 
@@ -163,9 +167,17 @@ enum class Action_Order
 	RunLeft,
 	HurtGround,
 	HurtFly,
+	Stun,
 	End,
 };
-
+enum class CameraRenderMode
+{
+	NONE,
+	FADEIN,
+	FADEOUT,
+	SubtleFadeIn,
+	SubtleFadeOut,
+};
 enum class CameraMode
 {
 	DontMove,
@@ -183,8 +195,11 @@ enum class PenColor
 {
 	MAGENTA,
 	YELLOW,
+	AQUA,
 	SKY,
 };
+
+
 
 union CollisionID
 {
