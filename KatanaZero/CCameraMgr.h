@@ -29,6 +29,24 @@ public:
 	HDC GetcomDC() { return comDC; }
 	HDC GetAquaDC() { return AquaDC; }
 
+	HDC GetColorDC(PenColor c)
+	{
+		switch (c)
+		{
+		
+		case PenColor::YELLOW:
+			return yellowDC;
+			break;
+
+
+		case PenColor::AQUA:
+			return AquaDC;
+			break;
+		}
+
+		return 0;
+	}
+
 	void SetCameraEffect(CameraEffect p) { effect = p; }
 	void SetCameraMode(CameraMode p) { mode = p; }
 	void SetCameraLimit(double left, double right, double upper, double bottom) { LeftLimit = left; RightLimit = right; UpperLimit = upper; BottomLimit = bottom; }

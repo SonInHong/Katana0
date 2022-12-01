@@ -12,5 +12,7 @@ public:
     virtual void Render(HDC _dc);
 
     void Slash(int dir);
+
+    void CheckAttackStop();
 };
 

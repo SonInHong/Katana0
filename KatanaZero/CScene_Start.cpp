@@ -6,6 +6,7 @@
 #include "CMonster.h"
 #include "CGrunt.h"
 #include "CPomp.h"
+#include "CGangster.h"
 #include "CColliderMgr.h"
 #include "CCameraMgr.h"
 #include "CCore.h"
@@ -85,12 +86,12 @@ void CScene_Start::Enter()
 	_pMon->SetMainOrder(Main_Order::LeanLeft);
 	AddObject(_pMon, GROUP_TYPE::MONSTER);
 	
-	_pMon = new CGrunt;
-	_pMon->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });
-	_pMon->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
-	_pMon->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
-	_pMon->SetRoamingPoint(doublepoint{ scaleA * 600,scaleA * 500 });
-	AddObject(_pMon, GROUP_TYPE::MONSTER);
+	CGangster* _pGang = new CGangster;
+	_pGang->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });
+	_pGang->SetScale(doublepoint{ scaleA * 30,scaleA * 60 });
+	_pGang->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
+	_pGang->SetRoamingPoint(doublepoint{ scaleA * 600,scaleA * 500 });
+	AddObject(_pGang, GROUP_TYPE::MONSTER);
 
 	//_pMon = new CGrunt;
 	//_pMon->SetPos(doublepoint{ scaleA * 600,scaleA * 400 });

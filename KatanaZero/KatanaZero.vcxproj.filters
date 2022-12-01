@@ -235,6 +235,12 @@
     <Filter Include="Engine\CObject\CAnimal\CMonster\CPomp\CPompStick">
       <UniqueIdentifier>{158f3252-c2a6-464a-986d-742af01bacb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CGangster">
+      <UniqueIdentifier>{3f71e771-a412-4de4-8f38-37b0610580ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun">
+      <UniqueIdentifier>{472033fa-3f09-446b-8840-85f1f69ae746}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -468,6 +474,12 @@
     <ClInclude Include="CAnimal.h">
       <Filter>Engine\CObject\CAnimal</Filter>
     </ClInclude>
+    <ClInclude Include="CGangster.h">
+      <Filter>Engine\CObject\CAnimal\CMonster\CGangster</Filter>
+    </ClInclude>
+    <ClInclude Include="CGangsterGun.h">
+      <Filter>Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KatanaZero.cpp">
@@ -688,6 +700,12 @@
     </ClCompile>
     <ClCompile Include="CAnimal.cpp">
       <Filter>Engine\CObject\CAnimal</Filter>
+    </ClCompile>
+    <ClCompile Include="CGangster.cpp">
+      <Filter>Engine\CObject\CAnimal\CMonster\CGangster</Filter>
+    </ClCompile>
+    <ClCompile Include="CGangsterGun.cpp">
+      <Filter>Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

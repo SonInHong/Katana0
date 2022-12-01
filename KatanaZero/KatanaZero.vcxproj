@@ -173,6 +173,8 @@
     <ClInclude Include="CCore.h" />
     <ClInclude Include="CEventMgr.h" />
     <ClInclude Include="CFloor.h" />
+    <ClInclude Include="CGangster.h" />
+    <ClInclude Include="CGangsterGun.h" />
     <ClInclude Include="CGroundBreaker.h" />
     <ClInclude Include="CGrunt.h" />
     <ClInclude Include="CGruntFist.h" />
@@ -252,6 +254,8 @@
     <ClCompile Include="CCore.cpp" />
     <ClCompile Include="CEventMgr.cpp" />
     <ClCompile Include="CFloor.cpp" />
+    <ClCompile Include="CGangster.cpp" />
+    <ClCompile Include="CGangsterGun.cpp" />
     <ClCompile Include="CGroundBreaker.cpp" />
     <ClCompile Include="CGrunt.cpp" />
     <ClCompile Include="CGruntFist.cpp" />

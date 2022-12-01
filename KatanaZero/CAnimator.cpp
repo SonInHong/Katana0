@@ -10,6 +10,8 @@ CAnimator::CAnimator()
 	:m_mapAnim{}
 	, m_pCurAnim(nullptr)
 	,ReRendering(false)
+	,rerender_color(PenColor::AQUA)
+	, rerender_alpha(120)
 {
 }
 

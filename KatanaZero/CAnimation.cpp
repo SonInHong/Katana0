@@ -252,12 +252,12 @@ void CAnimation::ReRender(HDC _dc)
 	func3.BlendFlags = 0;
 	func3.BlendOp = AC_SRC_OVER;
 	func3.AlphaFormat = 0;
-	func3.SourceConstantAlpha = 120;
+	func3.SourceConstantAlpha = m_Owner->rerender_alpha;
 
 
 	HDC com_DC = CCameraMgr::Create()->GetcomDC();
 
-	SelectObject(com_DC, PenMgr::Create()->GetBrush(PenColor::AQUA));
+	SelectObject(com_DC, PenMgr::Create()->GetBrush(m_Owner->rerender_color));
 
 	Rectangle(com_DC, -1, -1, m_SpriteSize.x + 1, m_SpriteSize.y + 1);   // 도화지 준비
 
@@ -266,10 +266,10 @@ void CAnimation::ReRender(HDC _dc)
 		, m_SpriteSize.x, m_SpriteSize.y, RGB(255, 255, 255));  // 그 위에 그리고
 
 	AlphaBlend(com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y
-		, CCameraMgr::Create()->GetAquaDC(), 0, 0, m_SpriteSize.x, m_SpriteSize.y, func3); // 그 위에 파란색 덫칠
+		, CCameraMgr::Create()->GetColorDC(m_Owner->rerender_color), 0, 0, m_SpriteSize.x, m_SpriteSize.y, func3); // 그 위에 색 덫칠
 
 	TransparentBlt(_dc, Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2, Pos.y - AnimationScaling.y * Resize.y * Scale.y / 2, AnimationScaling.x * Resize.x * Scale.x, AnimationScaling.y * Resize.y * Scale.y
-		, com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y, RGB(0, 255,255));
+		, com_DC, 0, 0, m_SpriteSize.x, m_SpriteSize.y, PenMgr::Create()->GetRGB(m_Owner->rerender_color));
 
 	SelectObject(com_DC, PenMgr::Create()->GetSkyBrush());
 }

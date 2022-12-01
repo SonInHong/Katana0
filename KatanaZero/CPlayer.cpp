@@ -439,7 +439,7 @@ void CPlayer::GetInput()
 			Stunned = false;
 		}
 
-		return;
+		
 	}
 
 	if (MainOrder == Main_Order::GetBurn)
@@ -1513,6 +1513,8 @@ void CPlayer::SlowOn()
 
 		CCameraMgr::Create()->SetCameraRenderMode(CameraRenderMode::SubtleFadeOut);
 		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->SetReRender(true);
+		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->SetReRender(true);
+		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->SetReRenderColor(PenColor::YELLOW);
 	
 }
 
@@ -1522,4 +1524,5 @@ void CPlayer::SlowOff()
 	CCameraMgr::Create()->SetCameraRenderMode(CameraRenderMode::SubtleFadeIn);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->SetReRender(false);
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->SetReRender(false);
 }

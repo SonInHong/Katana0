@@ -260,6 +260,30 @@ void CMonster::Update()
 		}
 	}
 
+	if (MainOrder == Main_Order::AttackLeft) 
+	{
+		ActionOrder = Action_Order::AttackLeft;
+	
+	}
+
+	if (MainOrder == Main_Order::AttackRight) 
+	{
+		ActionOrder = Action_Order::AttackRight;
+
+	}
+
+	if (MainOrder == Main_Order::ShotLeft)
+	{
+		ActionOrder = Action_Order::ShotLeft;
+
+	}
+
+	if (MainOrder == Main_Order::ShotRight)
+	{
+		ActionOrder = Action_Order::ShotRight;
+
+	}
+
 	//=================================================================================================== 피격
 	
 	if (MainOrder == Main_Order::GetHurt) // 피격시 

@@ -90,6 +90,11 @@ void CPomp::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompAttackLeft")->m_StartEvent = std::bind(&CPomp::Slash, this, Left); // 공격
 
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PompAttackRight")->m_CompleteEvent = std::bind(&CPomp::CheckAttackStop, this);  // 공격이 끝날때마다 공격상태 탈출조건 확인
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		->FindAnimation(L"PompAttackLeft")->m_CompleteEvent = std::bind(&CPomp::CheckAttackStop, this);
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompAttackRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"PompIdleRight");
@@ -411,19 +416,13 @@ void CPomp::Update()
 	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 150 && diff.x * LookDirection >= 0)
 	{
 		if (LookDirection == Right)
-			ActionOrder = Action_Order::AttackRight;
+			MainOrder = Main_Order::AttackRight;
 
-		else
-			ActionOrder = Action_Order::AttackLeft;
+		else if (LookDirection == Left)
+			MainOrder = Main_Order::AttackLeft;
 	}
 
-	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompAttackRight"
-		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 공격은 무조건 마무리
-		ActionOrder = Action_Order::AttackRight;
-
-	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompAttackLeft"
-		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)
-		ActionOrder = Action_Order::AttackLeft;
+	//======================================================================================================================
 
 	if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() == L"PompTurnRight"
 		&& MainOrder != Main_Order::GetHurt && MainOrder != Main_Order::MonsterStun)   // 피격시가 아니라면 턴동작은 무조건 마무리
@@ -724,4 +723,13 @@ void CPomp::Slash(int dir)
 	stick->Initialize();
 
 	CEventMgr::Create()->Event_CreateObj(stick, GROUP_TYPE::MONSTER_PROJECTILE);
+}
+
+void CPomp::CheckAttackStop()
+{
+	CPlayer* player = dynamic_cast<CPlayer*>(CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::PLAYER)[0]);
+	doublepoint diff = (player->GetPos() - Pos);
+
+	if (diff.Norm() > 150 || diff.x * LookDirection < 0)
+		MainOrder = Main_Order::PlayerDetected;
 }

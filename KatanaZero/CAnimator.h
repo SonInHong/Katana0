@@ -38,16 +38,18 @@ public:
     virtual void ReRender(HDC _dc);
 
     void SetReRender(bool b) { ReRendering = b; }
+    void SetReRenderColor(PenColor p) { rerender_color = p; }
+    void SetReRenderAlpha(int i) { rerender_alpha = i; }
 
-
-
-
+    friend CAnimation;
 
 
 private:
     std::map<std::wstring, CAnimation*> m_mapAnim;
     CAnimation* m_pCurAnim;
     bool ReRendering;
+    PenColor rerender_color;
+    int rerender_alpha;
 
 
 

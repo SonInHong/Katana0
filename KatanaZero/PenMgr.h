@@ -37,6 +37,30 @@ public:
 		return 0;
 	}
 
+	COLORREF GetRGB(PenColor c)
+	{
+		switch (c)
+		{
+		case PenColor::SKY:
+			return RGB(102, 255, 255);
+			break;
+
+		case PenColor::YELLOW:
+			return RGB(255, 212, 0);
+			break;
+
+		case PenColor::MAGENTA:
+			return RGB(255, 0, 255);
+			break;
+
+		case PenColor::AQUA:
+			return RGB(0, 255, 255);
+			break;
+		}
+
+		return 0;
+	}
+
 private:
 	HPEN GreenPen = 0;
 	HPEN RedPen = 0;
