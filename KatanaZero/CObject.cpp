@@ -40,6 +40,14 @@ void CObject::Update()
 
 }
 
+void CObject::Enter()
+{
+}
+
+void CObject::Exit()
+{
+}
+
 void CObject::ComponentUpdate()
 {
 	for (int i = 0; i < (UINT)COMPONENT_TYPE::END; ++i)
@@ -60,11 +68,8 @@ void CObject::Render(HDC _dc)
 
 void CObject::ReRender(HDC _dc)
 {
-	for (int i = 0; i < (UINT)COMPONENT_TYPE::END; ++i)
-	{
-		for (int j = 0; j < m_Component[i].size(); ++j)
-			m_Component[i][j]->ReRender(_dc);
-	}
+	for (int j = 0; j < m_Component[(UINT)COMPONENT_TYPE::ANIMATOR].size(); ++j)
+		m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][j]->ReRender(_dc);
 }
 
 void CObject::Destroy()

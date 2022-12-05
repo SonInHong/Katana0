@@ -8,6 +8,8 @@ public:
 	virtual ~CBloodEmitor();
 
 	virtual void Initialize();
+	virtual void Enter();
+	virtual void Exit();
 	virtual void Update();
 
 	void SetOwner(CObject* p) { Owner = p; }

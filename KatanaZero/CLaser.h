@@ -10,6 +10,8 @@ public:
     virtual ~CLaser();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
     virtual bool Collide(CObject* other);

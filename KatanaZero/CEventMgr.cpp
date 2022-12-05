@@ -46,7 +46,7 @@ void CEventMgr::Update()
 		{
 		case EVENT_TYPE::CREATEOBJECT:  //lparam은 Obj 주소, rParam은 Obj 타입
 		{
-			((CObject*)EventArr[i].lParam)->Initialize();
+			((CObject*)EventArr[i].lParam)->Enter();
 			CSceneMgr::Create()->GetCurScene()->AddObject((CObject*)EventArr[i].lParam, (GROUP_TYPE)EventArr[i].rParam);
 		}
 		break;

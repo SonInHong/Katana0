@@ -18,6 +18,14 @@ void CMap::Initialize()
 	
 }
 
+void CMap::Enter()
+{
+}
+
+void CMap::Exit()
+{
+}
+
 void CMap::Update()
 {
 }
@@ -64,7 +72,7 @@ void CMap::Render(HDC _dc)
 	CObject::Render(_dc);
 }
 
-void CMap::Load(const std::wstring& _Path)
+void CMap::Load(const std::wstring& _Path, double sizeup)
 {
 	std::wstring AbsPath = PathMgr::Create()->GetContentPath();
 	AbsPath += L"\\content\\MapData\\";
@@ -110,7 +118,7 @@ void CMap::Load(const std::wstring& _Path)
 	Scale.x = TileCount.x * TileSize.x;
 	Scale.y = TileCount.y * TileSize.y;
 
-	Copy(scaleA);
+	Copy(sizeup);
 
 }
 

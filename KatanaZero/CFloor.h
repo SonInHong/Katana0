@@ -1,17 +1,20 @@
 #pragma once
 #include "CObject.h"
+#include "CArchitecture.h"
 #include <map>
 
 class CNodeMgr;
 
 class CFloor :
-    public CObject
+    public CArchitecture
 {
 public:
     CFloor();
     virtual ~CFloor();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual bool Collide(CObject* other);
     virtual bool Colliding(CObject* other);
     virtual bool CollideEscape(CObject* other);

@@ -47,6 +47,8 @@ public:
 
 	virtual void Initialize();
 	virtual void Update();
+	virtual void Enter() = 0;
+	virtual void Exit() = 0;
 	virtual void ComponentUpdate() final;
 	virtual void Render(HDC _dc);
 	virtual void ReRender(HDC _dc);

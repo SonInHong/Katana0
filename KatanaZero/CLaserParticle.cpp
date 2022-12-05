@@ -1,12 +1,15 @@
 #include "pch.h"
 #include "CLaserParticle.h"
 #include "CCameraMgr.h"
+#include "CResourceMgr.h"
+
 
 CLaserParticle::CLaserParticle()
 {
 	//텍스쳐 로딩
-	Texture = new CTexture;
-	Texture->Load(L"Laser\\LaserParticle\\0.bmp");
+	Texture = CResourceMgr::Create()->Load<CTexture>(L"Laser\\LaserParticle\\0.bmp");
+
+	
 
 	Gravity = 3;
 }
@@ -21,6 +24,9 @@ void CLaserParticle::Shoot()
 
 void CLaserParticle::Render(HDC _dc)
 {
+	if (!Valid)
+		return;
+
 	if (Valid)
 	{
 		doublepoint pos = CCameraMgr::Create()->CameraCoordinate(Pos);

@@ -11,6 +11,8 @@ public:
     ~CPompStick();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
 
     virtual bool Collide(CObject* other);

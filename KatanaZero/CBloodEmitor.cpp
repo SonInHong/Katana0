@@ -18,26 +18,42 @@ CBloodEmitor::~CBloodEmitor()
 void CBloodEmitor::Initialize()
 {
 
+	m_PoolSize = 300;
+
 	for (int i = 0; i < m_PoolSize; ++i)
 	{
 		CBlood* _particle = new CBlood;
 		_particle->Initialize();
-		CEventMgr::Create()->Event_CreateObj(_particle, GROUP_TYPE::PARTICLE);
-
+		
 		m_Particles.push_back(_particle);
 	}
 }
 
+void CBloodEmitor::Enter()
+{
+
+	for (int i = 0; i < m_PoolSize; ++i)
+	{
+		CEventMgr::Create()->Event_CreateObj(m_Particles[i], GROUP_TYPE::PARTICLE);
+	}
+}
+
+void CBloodEmitor::Exit()
+{
+}
+
 void CBloodEmitor::Update()
 {
+	if (!OnOff)
+		return;
+
 	if (Owner)
 	{
 		Pos = Owner->GetPos() + OffSet;
 		m_AngleRange; // 앵글도 변경해준다.
 	}
 
-	if (!OnOff)
-		return;
+	
 
 	std::random_device rd;
 	std::default_random_engine eng(rd());
@@ -93,6 +109,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 
@@ -150,6 +168,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 
@@ -204,6 +224,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 
@@ -257,6 +279,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 
@@ -310,6 +334,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 		///===================================================== 하나더 
@@ -362,6 +388,8 @@ void CBloodEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 	}

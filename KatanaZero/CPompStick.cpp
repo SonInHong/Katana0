@@ -17,7 +17,7 @@ CPompStick::CPompStick()
 	, TimeLimit(0.3)
 	, Valid(true)
 {
-	CreateCollider();
+	
 }
 
 CPompStick::~CPompStick()
@@ -32,6 +32,16 @@ void CPompStick::Initialize()
 	Scale.y = scaleA * 30;
 
 	Speed = scaleA * 500;
+
+	CreateCollider();
+}
+
+void CPompStick::Enter()
+{
+}
+
+void CPompStick::Exit()
+{
 }
 
 void CPompStick::Update()

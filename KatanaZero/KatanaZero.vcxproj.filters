@@ -241,6 +241,60 @@
     <Filter Include="Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun">
       <UniqueIdentifier>{472033fa-3f09-446b-8840-85f1f69ae746}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\CObject\CAnimal\투사체">
+      <UniqueIdentifier>{ce4f6e8c-9454-4345-9574-084396c70c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\투사체\CBullet">
+      <UniqueIdentifier>{fc932409-75fd-4be8-90f8-faafd0640156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Managers\CNeutalObjMgr">
+      <UniqueIdentifier>{c73116bd-7f91-4574-a94f-f6572da53037}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CEffect\CGunSpark">
+      <UniqueIdentifier>{08c75e7a-04ab-4204-aaa8-7c418837a52a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CScene\CScene_Stage2">
+      <UniqueIdentifier>{9df2190b-a193-4217-b83e-997ddf428c64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\Architecture\CWall\CWall_CantClimb">
+      <UniqueIdentifier>{c5303af0-01dd-417e-9670-f023c6548a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\Architecture\CWall\CWall_CantClimb\CWallDoor">
+      <UniqueIdentifier>{3f9e10cc-d983-4947-a1aa-49caacc00c78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\Architecture\CDoor\CIronDoor">
+      <UniqueIdentifier>{4cbb26f1-87c4-4f5a-86fa-ad114d8f711a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CBackgroundObj">
+      <UniqueIdentifier>{a9fef843-264f-4fbe-90e4-5e2cd14ecbdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CBackgroundObj\CTable">
+      <UniqueIdentifier>{636ff1f3-6600-43fc-aecd-8a79f08c145b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CWallCam">
+      <UniqueIdentifier>{caf0c79f-fc4c-4211-9b93-585ba8a1ab58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Managers\CMonsterPoolMgr">
+      <UniqueIdentifier>{33db3e4a-4505-4136-a194-865225986256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CAnimal\투사체\CKnife">
+      <UniqueIdentifier>{07ad98d7-abef-4839-ae62-f42a5dd19ad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\Architecture\CWall\CWall_CantClimb\CSmokeValve">
+      <UniqueIdentifier>{94cc8fe7-db7d-483e-97f9-d19e2b341486}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CParticle\CSmokeEmitor">
+      <UniqueIdentifier>{72cf1d7d-8145-47c3-a20f-e51e5964b476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CParticle\CSmokeEmitor\CSmoke">
+      <UniqueIdentifier>{1834be5a-8ea2-4293-836f-2d196bc077b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Managers\CParticleMgr">
+      <UniqueIdentifier>{88984805-5b80-41ef-8558-d2cc06306e48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\CObject\CEffect\CBulletReflect">
+      <UniqueIdentifier>{b81e69b3-6144-4f1f-8a63-28c6d3b7d695}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -480,6 +534,69 @@
     <ClInclude Include="CGangsterGun.h">
       <Filter>Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun</Filter>
     </ClInclude>
+    <ClInclude Include="CBullet.h">
+      <Filter>Engine\CObject\CAnimal\투사체\CBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="CArchitecture.h">
+      <Filter>Engine\CObject\Architecture</Filter>
+    </ClInclude>
+    <ClInclude Include="CNeutralObjMgr.h">
+      <Filter>Engine\Managers\CNeutalObjMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="CGunSparkRight.h">
+      <Filter>Engine\CObject\CEffect\CGunSpark</Filter>
+    </ClInclude>
+    <ClInclude Include="CGunSparkLeft.h">
+      <Filter>Engine\CObject\CEffect\CGunSpark</Filter>
+    </ClInclude>
+    <ClInclude Include="CScene_Stage2.h">
+      <Filter>Engine\CScene\CScene_Stage2</Filter>
+    </ClInclude>
+    <ClInclude Include="CWall_CantClimb.h">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb</Filter>
+    </ClInclude>
+    <ClInclude Include="CWallDoor.h">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb\CWallDoor</Filter>
+    </ClInclude>
+    <ClInclude Include="CIronDoorRight.h">
+      <Filter>Engine\CObject\Architecture\CDoor\CIronDoor</Filter>
+    </ClInclude>
+    <ClInclude Include="CIronDoorLeft.h">
+      <Filter>Engine\CObject\Architecture\CDoor\CIronDoor</Filter>
+    </ClInclude>
+    <ClInclude Include="CBackgroundObj.h">
+      <Filter>Engine\CObject\CBackgroundObj</Filter>
+    </ClInclude>
+    <ClInclude Include="CTable.h">
+      <Filter>Engine\CObject\CBackgroundObj\CTable</Filter>
+    </ClInclude>
+    <ClInclude Include="CWallCam.h">
+      <Filter>Engine\CObject\CWallCam</Filter>
+    </ClInclude>
+    <ClInclude Include="CMonsterPoolMgr.h">
+      <Filter>Engine\Managers\CMonsterPoolMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="CKnife.h">
+      <Filter>Engine\CObject\CAnimal\투사체\CKnife</Filter>
+    </ClInclude>
+    <ClInclude Include="ThrowingObj.h">
+      <Filter>Engine\CObject\CAnimal\투사체</Filter>
+    </ClInclude>
+    <ClInclude Include="CSmokeValve.h">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb\CSmokeValve</Filter>
+    </ClInclude>
+    <ClInclude Include="CSmoke.h">
+      <Filter>Engine\CObject\CParticle\CSmokeEmitor\CSmoke</Filter>
+    </ClInclude>
+    <ClInclude Include="CSmokeEmitor.h">
+      <Filter>Engine\CObject\CParticle\CSmokeEmitor</Filter>
+    </ClInclude>
+    <ClInclude Include="CParticleMgr.h">
+      <Filter>Engine\Managers\CParticleMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="CBulletReflect.h">
+      <Filter>Engine\CObject\CEffect\CBulletReflect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KatanaZero.cpp">
@@ -706,6 +823,69 @@
     </ClCompile>
     <ClCompile Include="CGangsterGun.cpp">
       <Filter>Engine\CObject\CAnimal\CMonster\CGangster\CGangsterGun</Filter>
+    </ClCompile>
+    <ClCompile Include="CBullet.cpp">
+      <Filter>Engine\CObject\CAnimal\투사체\CBullet</Filter>
+    </ClCompile>
+    <ClCompile Include="CArchitecture.cpp">
+      <Filter>Engine\CObject\Architecture</Filter>
+    </ClCompile>
+    <ClCompile Include="CNeutralObjMgr.cpp">
+      <Filter>Engine\Managers\CNeutalObjMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="CGunSparkRight.cpp">
+      <Filter>Engine\CObject\CEffect\CGunSpark</Filter>
+    </ClCompile>
+    <ClCompile Include="CGunSparkLeft.cpp">
+      <Filter>Engine\CObject\CEffect\CGunSpark</Filter>
+    </ClCompile>
+    <ClCompile Include="CScene_Stage2.cpp">
+      <Filter>Engine\CScene\CScene_Stage2</Filter>
+    </ClCompile>
+    <ClCompile Include="CWall_CantClimb.cpp">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb</Filter>
+    </ClCompile>
+    <ClCompile Include="CWallDoor.cpp">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb\CWallDoor</Filter>
+    </ClCompile>
+    <ClCompile Include="CIronDoorRight.cpp">
+      <Filter>Engine\CObject\Architecture\CDoor\CIronDoor</Filter>
+    </ClCompile>
+    <ClCompile Include="CIronDoorLeft.cpp">
+      <Filter>Engine\CObject\Architecture\CDoor\CIronDoor</Filter>
+    </ClCompile>
+    <ClCompile Include="CBackgroundObj.cpp">
+      <Filter>Engine\CObject\CBackgroundObj</Filter>
+    </ClCompile>
+    <ClCompile Include="CTable.cpp">
+      <Filter>Engine\CObject\CBackgroundObj\CTable</Filter>
+    </ClCompile>
+    <ClCompile Include="CWallCam.cpp">
+      <Filter>Engine\CObject\CWallCam</Filter>
+    </ClCompile>
+    <ClCompile Include="CMonsterPoolMgr.cpp">
+      <Filter>Engine\Managers\CMonsterPoolMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="CKnife.cpp">
+      <Filter>Engine\CObject\CAnimal\투사체\CKnife</Filter>
+    </ClCompile>
+    <ClCompile Include="ThrowingObj.cpp">
+      <Filter>Engine\CObject\CAnimal\투사체</Filter>
+    </ClCompile>
+    <ClCompile Include="CSmokeValve.cpp">
+      <Filter>Engine\CObject\Architecture\CWall\CWall_CantClimb\CSmokeValve</Filter>
+    </ClCompile>
+    <ClCompile Include="CSmoke.cpp">
+      <Filter>Engine\CObject\CParticle\CSmokeEmitor\CSmoke</Filter>
+    </ClCompile>
+    <ClCompile Include="CSmokeEmitor.cpp">
+      <Filter>Engine\CObject\CParticle\CSmokeEmitor</Filter>
+    </ClCompile>
+    <ClCompile Include="CParticleMgr.cpp">
+      <Filter>Engine\Managers\CParticleMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="CBulletReflect.cpp">
+      <Filter>Engine\CObject\CEffect\CBulletReflect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

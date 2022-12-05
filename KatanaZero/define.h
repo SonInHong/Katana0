@@ -43,7 +43,7 @@ struct doublepoint
 	}
 
 	double Norm() { return sqrt(pow(x, 2) + pow(y, 2)); }
-
+	doublepoint Normalize() { return doublepoint{ x / Norm(),y / Norm() }; }
 	double Angle() { return atan2(y, x) * 180 / M_PI; }
 	
 };
@@ -60,8 +60,8 @@ enum class Object_State
 enum class GROUP_TYPE
 {
 	DEFAULT,
-	BACKGROUND,
 	MAP,
+	BACKGROUND,
 	FLOOR,
 	Door,
 	TILE,
@@ -72,9 +72,8 @@ enum class GROUP_TYPE
 	MONSTER,
 	PLAYER,
 	
-	
-	
 	PLAYER_PROJECTILE,
+	NEUTRAL_OBJECT,
 	CENSOR,
 	FINALEFFECT,
 	UI = 30,
@@ -199,13 +198,27 @@ enum class CameraEffect
 
 enum class PenColor
 {
+	BLACK,
 	MAGENTA,
 	YELLOW,
 	AQUA,
 	SKY,
 };
 
+enum class WallCamState
+{
+	FollowPlayer,
+	Stay,
+	Roam,
+};
 
+enum class ThrowingObjState
+{
+	Neutral,
+	Stick,
+	OwnedByPlayer,
+	Throwing,
+};
 
 union CollisionID
 {

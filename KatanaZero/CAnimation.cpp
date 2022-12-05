@@ -186,9 +186,17 @@ void CAnimation::Render(HDC _dc)
 
 		}
 
+		m_Owner->ReRendering = false;
+
 		return;
 
 	}
+
+	if ((int)(Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2) > 2000 ||
+		(int)(Pos.y - AnimationScaling.y * Resize.y * Scale.y / 2) > 1300 ||
+			(int)(Pos.x + AnimationScaling.x * Resize.x * Scale.x / 2) < 0 ||
+			(int)(Pos.y + AnimationScaling.y * Resize.y * Scale.y / 2) < 0 )
+			return;
 
 
 	TransparentBlt(_dc, (int)(Pos.x - AnimationScaling.x * Resize.x * Scale.x / 2) , (int)(Pos.y - AnimationScaling.y * Resize.y* Scale.y / 2)

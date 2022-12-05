@@ -20,6 +20,14 @@ void CWall::Initialize()
 	CreateCollider();
 }
 
+void CWall::Enter()
+{
+}
+
+void CWall::Exit()
+{
+}
+
 bool CWall::Collide(CObject* other)
 {
 	std::map<DWORD_PTR, POINT>::iterator iter = m_CollideDir.find((DWORD_PTR)other);

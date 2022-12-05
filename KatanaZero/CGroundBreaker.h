@@ -11,6 +11,8 @@ public:
 
     virtual bool CollideEscape(CObject* other);
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
 
 private:

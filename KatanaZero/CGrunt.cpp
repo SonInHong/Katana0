@@ -98,13 +98,6 @@ void CGrunt::Initialize()
 		->FindAnimation(L"GruntTurnLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"GruntIdleLeft");
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GruntAttackRight")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Right);  // 공격
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GruntAttackLeft")->m_StartEvent = std::bind(&CGrunt::SlashFist, this, Left); // 공격
-
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GruntAttackRight")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"GruntIdleRight");
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
@@ -147,10 +140,21 @@ void CGrunt::Initialize()
 		->FindAnimation(L"GruntHurtflyLeft")->AfterImageOn(0.2, PenColor::MAGENTA);
 
 	//=====================================================================================================================
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntIdleRight");
-	LookDirection = Right;
+	
 
 	
+}
+
+void CGrunt::Enter()
+{
+	CMonster::Enter();
+
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntIdleRight");
+	LookDirection = Right;
+}
+
+void CGrunt::Exit()
+{
 }
 
 void CGrunt::Update()
@@ -631,14 +635,38 @@ void CGrunt::Update()
 
 	case Action_Order::AttackLeft:
 	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackLeft");
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackLeft");
+			SlashFist(Left);
+			AttackTimer = 0;
+
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GruntAttackLeft")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntIdleLeft");
+		}
 	
 	}
 	break;
 
 	case Action_Order::AttackRight:
 	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackRight");
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntAttackRight");
+			SlashFist(Right);
+			AttackTimer = 0;
+
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GruntAttackRight")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GruntIdleRight");
+		}
 		
 	}
 	break;
@@ -710,17 +738,7 @@ void CGrunt::Update()
 
 	}
 	
-	AdjustHurtAnimation();
-
-
-	wchar_t _Buffer[250];
-	swprintf_s(_Buffer, L"Main: %d, Move: %d, Action: %d. force.x: %f, Xspeed: %f, Yspeed: %f",
-		MainOrder,MoveOrder,ActionOrder, force.x, velocity.x, velocity.y);
-
-	std::wstring str = {};
-	str += _Buffer;
-		
-	//SetWindowText(CCore::Create()->GetWindowData().hwnd, str.c_str());
+	AttackTimer += TimeMgr::Create()->dt();
 }
 
 void CGrunt::Render(HDC _dc)

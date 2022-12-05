@@ -29,7 +29,10 @@
 #include "CNormalDoorLeft.h"
 #include "CLaser.h"
 #include "CEffectMgr.h"
-
+#include "CNeutralObjMgr.h"
+#include "CWall_CantClimb.h"
+#include "CWallDoor.h"
+#include "CParticleMgr.h"
 
 CScene_Start::CScene_Start()
 {
@@ -56,10 +59,15 @@ void CScene_Start::Enter()
 		
 	//이펙트매니저 이펙트들 넣기
 	CEffectMgr::Create()->PutInBox();
+	
+	//투사체들 오브젝트 풀링
+	CNeutralObjMgr::Create()->PutInBox();
+	//파티클 오브젝트 풀링
+	CParticleMgr::Create()->Enter();
 
 	//Map 추가
 	CMap* _pMap = new CMap;
-	_pMap->Load(L"Map.tile");
+	_pMap->Load(L"Map.tile",scaleA);
 	AddObject(_pMap, GROUP_TYPE::MAP);
 
 	//커서 추가
@@ -119,9 +127,6 @@ void CScene_Start::Enter()
 	_pStair1->SetDir(Right);
 	AddObject(_pStair1, GROUP_TYPE::FLOOR);
 
-	CStairCensor* _pCensor = new CStairCensor; //센서
-	_pCensor->SetPos(doublepoint{ scaleA * 1006,scaleA * 286 });
-	//AddObject(_pCensor, GROUP_TYPE::CENSOR);
 
 	CStair* _pStair2 = new CStair;                                         //왼쪽 작은 계단
 	_pStair2->SetScale(doublepoint{ scaleA * 60,scaleA * 60 });
@@ -196,15 +201,21 @@ void CScene_Start::Enter()
 	_pWall->SetPos(doublepoint{ scaleA * 157,scaleA * 300 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
 
-	_pWall = new CWall;
-	_pWall->SetScale(doublepoint{ scaleA * 35,scaleA * 700 });
-	_pWall->SetPos(doublepoint{ scaleA * 1260,scaleA * 400 });
-	AddObject(_pWall, GROUP_TYPE::FLOOR);
+	CWall_CantClimb* _pWall2 = new CWall_CantClimb;
+	_pWall2->SetScale(doublepoint{ scaleA * 35,scaleA * 700 });
+	_pWall2->SetPos(doublepoint{ scaleA * 1260,scaleA * 400 });
+	AddObject(_pWall2, GROUP_TYPE::FLOOR);
 
 	_pWall = new CWall;
 	_pWall->SetScale(doublepoint{ scaleA * 60,scaleA * 225 });
 	_pWall->SetPos(doublepoint{ scaleA * 480,scaleA * 112.5 });
 	AddObject(_pWall, GROUP_TYPE::FLOOR);
+
+	CWallDoor* _pWallDoor = new CWallDoor;
+	_pWallDoor->SetScale(doublepoint{ 60,300 });
+	_pWallDoor->SetPos(doublepoint{ 800,200 });
+	_pWallDoor->SetAnimationScaling(doublepoint{ 3,3 });
+	AddObject(_pWallDoor, GROUP_TYPE::FLOOR);
 
 	//문
 	
@@ -229,17 +240,15 @@ void CScene_Start::Enter()
 	_pLaser->SetAnimationScaling(doublepoint{ scaleA * 2,scaleA * 2 });
 	AddObject(_pLaser, GROUP_TYPE::TRAP);
 
-	// 파티클
-	CDirtyWaterEmitor* _pDir = new CDirtyWaterEmitor;
-	_pDir->SetOnOff(true);
-	_pDir->SetPos(doublepoint{ 500,500 });
-	//AddObject(_pDir, GROUP_TYPE::PARTICLE_EMITOR);
 	
-	CDustcloudEmitor* _pDus = new CDustcloudEmitor;
-	_pDus->SetOnOff(true);
-	_pDus->SetOwner(_pObj);
-	_pDus->SetOffset(doublepoint{ 0,25 });
-	//AddObject(_pDus, GROUP_TYPE::PARTICLE_EMITOR);
+	//
+	CNeutralObjMgr::Create()->Knife->SetPos(doublepoint{ 1000,400 });
+	CNeutralObjMgr::Create()->Knife->SetOwner(_pObj);
+	CNeutralObjMgr::Create()->Knife->SetValid(true);
+	CNeutralObjMgr::Create()->Knife->SetState(ThrowingObjState::Neutral);
+
+
+	CParticleMgr::Create()->Enter();
 
 	//UI 추가
 	/*CPanelUI* _pUI = new CPanelUI;
@@ -265,6 +274,14 @@ void CScene_Start::Enter()
 		}
 	}
 
+	for (int i = 0; i < (UINT)GROUP_TYPE::END; ++i)
+	{
+		for (int j = 0; j < m_arrObj[i].size(); ++j)
+		{
+			m_arrObj[i][j]->Enter();
+		}
+	}
+
 	//충돌 그룹 지정
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER_PROJECTILE, GROUP_TYPE::MONSTER);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER_PROJECTILE, GROUP_TYPE::FLOOR);
@@ -275,6 +292,10 @@ void CScene_Start::Enter()
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::MONSTER, GROUP_TYPE::TRAP);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER, GROUP_TYPE::TRAP);
 	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::PLAYER_PROJECTILE, GROUP_TYPE::MONSTER_PROJECTILE);
+	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::NEUTRAL_OBJECT, GROUP_TYPE::FLOOR);
+	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::NEUTRAL_OBJECT, GROUP_TYPE::PLAYER);
+	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::NEUTRAL_OBJECT, GROUP_TYPE::MONSTER);
+	CColliderMgr::Create()->CheckGroup(GROUP_TYPE::NEUTRAL_OBJECT, GROUP_TYPE::PLAYER_PROJECTILE);
 
 	//카메라 모드 지정
 	CCameraMgr::Create()->SetCameraMode(CameraMode::FollowPlayer);

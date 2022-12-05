@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "CEffectMgr.h"
-#include "CEventMgr.h"
+
 
 CEffectMgr::CEffectMgr()
 {
@@ -12,27 +12,61 @@ CEffectMgr::~CEffectMgr()
 
 void CEffectMgr::Initialize()
 {
-	JumpCloud = new CJumpCloud;
-	JumpCloud->Initialize();
 
-	JumpCloudRight = new CJumpCloudRight;
-	JumpCloudRight->Initialize();
+	for (int i = 0; i < 10; ++i)
+	{
+		JumpCloud.effect.push_back(new CJumpCloud);
+		JumpCloud.effect[i]->Initialize();
+	}
 
-	JumpCloudLeft = new CJumpCloudLeft;
-	JumpCloudLeft->Initialize();
+	for (int i = 0; i < 10; ++i)
+	{
+		JumpCloudRight.effect.push_back(new CJumpCloudRight);
+		JumpCloudRight.effect[i]->Initialize();
+	}
 
-	LandCloud = new CLandCloud;
-	LandCloud->Initialize();
+	for (int i = 0; i < 10; ++i)
+	{
+		JumpCloudLeft.effect.push_back(new CJumpCloudLeft);
+		JumpCloudLeft.effect[i]->Initialize();
+	}
 
+	for (int i = 0; i < 10; ++i)
+	{
+		GunSparkLeft.effect.push_back(new CGunSparkLeft);
+		GunSparkLeft.effect[i]->Initialize();
+	}
+
+	for (int i = 0; i < 10; ++i)
+	{
+		GunSparkRight.effect.push_back(new CGunSparkRight);
+		GunSparkRight.effect[i]->Initialize();
+	}
+
+	for (int i = 0; i < 10; ++i)
+	{
+		BulletReflect.effect.push_back(new CBulletReflect);
+		BulletReflect.effect[i]->Initialize();
+	}
+
+	
 	HitEffect = new CHitEffect;
 	HitEffect->Initialize();
+
+	
 }
 
 void CEffectMgr::PutInBox() // 현재 씬의 오브젝트 목록에 집어넣음.
 {
-	CEventMgr::Create()->Event_CreateObj(JumpCloud, GROUP_TYPE::FINALEFFECT);
-	CEventMgr::Create()->Event_CreateObj(JumpCloudRight, GROUP_TYPE::FINALEFFECT);
-	CEventMgr::Create()->Event_CreateObj(JumpCloudLeft, GROUP_TYPE::FINALEFFECT);
-	CEventMgr::Create()->Event_CreateObj(LandCloud, GROUP_TYPE::FINALEFFECT);
+
+	JumpCloud.PutInBox();
+	JumpCloudLeft.PutInBox();
+	JumpCloudRight.PutInBox();
+	LandCloud.PutInBox();
+	GunSparkLeft.PutInBox();
+	GunSparkRight.PutInBox();
+	BulletReflect.PutInBox();
+	
 	CEventMgr::Create()->Event_CreateObj(HitEffect, GROUP_TYPE::FINALEFFECT);
+	
 }

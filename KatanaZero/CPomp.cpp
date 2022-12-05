@@ -29,7 +29,7 @@ CPomp::~CPomp()
 void CPomp::Initialize()
 {
 	CMonster::Initialize();
-	
+
 	CreateCollider(doublepoint{ 0,10 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Pomp\\spr_pomp_idle\\right", L"PompIdleRight", doublepoint{ 0,0 }, doublepoint{ 33,42 }, 8, 0.07, true, doublepoint{ 0,-10 });
@@ -83,13 +83,7 @@ void CPomp::Initialize()
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompTurnLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"PompIdleLeft");
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PompAttackRight")->m_StartEvent = std::bind(&CPomp::Slash, this, Right);  // 공격
-
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"PompAttackLeft")->m_StartEvent = std::bind(&CPomp::Slash, this, Left); // 공격
-
+		
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompAttackRight")->m_CompleteEvent = std::bind(&CPomp::CheckAttackStop, this);  // 공격이 끝날때마다 공격상태 탈출조건 확인
 
@@ -138,9 +132,20 @@ void CPomp::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"PompHurtflyLeft")->AfterImageOn(0.2, PenColor::MAGENTA);
 
+	
+}
+
+void CPomp::Enter()
+{
+	CMonster::Enter();
+
 	//=====================================================================================================================
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompIdleRight");
 	LookDirection = Right;
+}
+
+void CPomp::Exit()
+{
 }
 
 void CPomp::Update()
@@ -620,13 +625,37 @@ void CPomp::Update()
 
 	case Action_Order::AttackLeft:
 	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompAttackLeft");
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompAttackLeft");
+			Slash(Left);
+			AttackTimer = 0;
+
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"PompAttackLeft")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompIdleLeft");
+		}
 	}
 	break;
 
 	case Action_Order::AttackRight:
 	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompAttackRight");
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompAttackRight");
+			Slash(Right);
+			AttackTimer = 0;
+
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"PompAttackRight")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"PompIdleRight");
+		}
 	}
 	break;
 
@@ -706,6 +735,9 @@ void CPomp::Update()
 	break;
 
 	}
+
+
+	AttackTimer += TimeMgr::Create()->dt(); // 타이머는 계속 흘러간다.
 }
 
 void CPomp::Render(HDC _dc)

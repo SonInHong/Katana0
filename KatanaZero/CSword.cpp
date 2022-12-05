@@ -19,23 +19,12 @@ CSword::CSword()
 	,Direction(1)
 	, Angle(0)
 {
-	CreateCollider();
-	//CreateAnimator();
-
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Effect\\spr_dragon_slash\\right", L"DragonSlashRight", doublepoint{ 0,0 }, doublepoint{ 94,38 }, 5, 0.07, false);
-
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->FindAnimation(L"DragonSlashRight")->m_CompleteEvent = std::bind(&CEventMgr::Event_DestroyObj, CEventMgr::Create(), this);
-
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Effect\\spr_dragon_slash\\left", L"DragonSlashLeft", doublepoint{ 0,0 }, doublepoint{ 94,38 }, 5, 0.07, false);
-
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->FindAnimation(L"DragonSlashLeft")->m_CompleteEvent = std::bind(&CEventMgr::Event_DestroyObj, CEventMgr::Create(), this);
 
 	Scale.x = scaleA * 30;
 	Scale.y = scaleA * 30;
 
 	Speed = scaleA * 1000;
 
-	
 }
 
 CSword::~CSword()
@@ -44,20 +33,19 @@ CSword::~CSword()
 
 void CSword::Initialize()
 {
-
+	CreateCollider();
 
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
 	
-	
+}
 
-	//if(cos(Angle)>0)
-	//	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"DragonSlashRight");
+void CSword::Enter()
+{
+}
 
-	//else if(cos(Angle) < 0)
-		//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"DragonSlashLeft");
-
-	
+void CSword::Exit()
+{
 }
 
 void CSword::Update()
@@ -76,14 +64,7 @@ void CSword::Update()
 
 	if (Valid)
 	{
-		//if (OffSet.Norm() > 50 || OffSet.Norm() < -50)
-			//Direction = -1;
-
-		
-			
-
 	
-
 		if (OffSet.Norm() < 70 * scaleA)
 		{
 			OffSet.x += cos(Angle) * Speed * TimeMgr::Create()->dt();
@@ -114,7 +95,7 @@ bool CSword::Collide(CObject* other)
 
 	CMonster* mon = dynamic_cast<CMonster*>(other);
 	
-	if (mon && mon->MainOrder != Main_Order::End && mon->MainOrder != Main_Order::GetHurt)
+	if (mon && mon->MainOrder != Main_Order::End && mon->MainOrder != Main_Order::GetHurt && mon->MainOrder != Main_Order::GetBurn && mon->MainOrder != Main_Order::Dead)
 	{
 		mon->MainOrder = Main_Order::GetHurt;
 		mon->HurtAngle = Angle;
@@ -156,7 +137,7 @@ bool CSword::Colliding(CObject* other)
 
 	CMonster* mon = dynamic_cast<CMonster*>(other);
 
-	if (mon && mon->MainOrder != Main_Order::End && mon->MainOrder != Main_Order::GetHurt)
+	if (mon && mon->MainOrder != Main_Order::End && mon->MainOrder != Main_Order::GetHurt && mon->MainOrder != Main_Order::GetBurn && mon->MainOrder != Main_Order::Dead)
 	{
 		mon->MainOrder = Main_Order::GetHurt;
 		mon->HurtAngle = Angle;
@@ -165,14 +146,7 @@ bool CSword::Colliding(CObject* other)
 		CEffectMgr::Create()->HitEffect->Shoot(doublepoint{ Pos.x - 1500 * cos(Angle), Pos.y - 1500 * sin(Angle) }
 			, doublepoint{ Pos.x + 1500 * cos(Angle), Pos.y + 1500 * sin(Angle) }
 		, 30000, 2000);
-
-		//Valid = false;
-		//OffSet = doublepoint{ 0,0 };
-		//Pos.x = Owner->GetPos().x + OffSet.x;
-		//Pos.y = Owner->GetPos().y + OffSet.y;
-
-		//Timer = 1;
-
+				
 		return true;
 	}
 

@@ -153,8 +153,12 @@
     <ClInclude Include="CAnimal.h" />
     <ClInclude Include="CAnimation.h" />
     <ClInclude Include="CAnimator.h" />
+    <ClInclude Include="CArchitecture.h" />
+    <ClInclude Include="CBackgroundObj.h" />
     <ClInclude Include="CBlood.h" />
     <ClInclude Include="CBloodEmitor.h" />
+    <ClInclude Include="CBullet.h" />
+    <ClInclude Include="CBulletReflect.h" />
     <ClInclude Include="CButtonUI.h" />
     <ClInclude Include="CCameraMgr.h" />
     <ClInclude Include="CCursor.h" />
@@ -178,16 +182,23 @@
     <ClInclude Include="CGroundBreaker.h" />
     <ClInclude Include="CGrunt.h" />
     <ClInclude Include="CGruntFist.h" />
+    <ClInclude Include="CGunSparkLeft.h" />
+    <ClInclude Include="CGunSparkRight.h" />
     <ClInclude Include="CHitEffect.h" />
+    <ClInclude Include="CIronDoorLeft.h" />
+    <ClInclude Include="CIronDoorRight.h" />
     <ClInclude Include="CJumpCloud.h" />
     <ClInclude Include="CJumpCloudLeft.h" />
     <ClInclude Include="CJumpCloudRight.h" />
+    <ClInclude Include="CKnife.h" />
     <ClInclude Include="CLandCloud.h" />
     <ClInclude Include="CLaser.h" />
     <ClInclude Include="CLaserParticle.h" />
     <ClInclude Include="CLaserparticleEmitor.h" />
     <ClInclude Include="CLineCollider.h" />
     <ClInclude Include="CMap.h" />
+    <ClInclude Include="CMonsterPoolMgr.h" />
+    <ClInclude Include="CNeutralObjMgr.h" />
     <ClInclude Include="CNodeMgr.h" />
     <ClInclude Include="CNormalDoorLeft.h" />
     <ClInclude Include="CNormalDoorRight.h" />
@@ -195,10 +206,15 @@
     <ClInclude Include="CPanelUI.h" />
     <ClInclude Include="CParticle.h" />
     <ClInclude Include="CParticleEmitor.h" />
+    <ClInclude Include="CParticleMgr.h" />
     <ClInclude Include="CPomp.h" />
     <ClInclude Include="CPompStick.h" />
     <ClInclude Include="CRigidBody.h" />
+    <ClInclude Include="CScene_Stage2.h" />
     <ClInclude Include="CScene_Tool.h" />
+    <ClInclude Include="CSmoke.h" />
+    <ClInclude Include="CSmokeEmitor.h" />
+    <ClInclude Include="CSmokeValve.h" />
     <ClInclude Include="CStair.h" />
     <ClInclude Include="CStairCensor.h" />
     <ClInclude Include="CSword.h" />
@@ -210,6 +226,7 @@
     <ClInclude Include="CScene.h" />
     <ClInclude Include="CSceneMgr.h" />
     <ClInclude Include="CScene_Start.h" />
+    <ClInclude Include="CTable.h" />
     <ClInclude Include="CTexture.h" />
     <ClInclude Include="CTile.h" />
     <ClInclude Include="CTileUI.h" />
@@ -217,6 +234,9 @@
     <ClInclude Include="CUI.h" />
     <ClInclude Include="CUIMgr.h" />
     <ClInclude Include="CWall.h" />
+    <ClInclude Include="CWallCam.h" />
+    <ClInclude Include="CWallDoor.h" />
+    <ClInclude Include="CWall_CantClimb.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KatanaZero.h" />
@@ -228,14 +248,19 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="CRunDustcloudEmitor.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="ThrowingObj.h" />
     <ClInclude Include="TimeMgr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CAnimal.cpp" />
     <ClCompile Include="CAnimation.cpp" />
     <ClCompile Include="CAnimator.cpp" />
+    <ClCompile Include="CArchitecture.cpp" />
+    <ClCompile Include="CBackgroundObj.cpp" />
     <ClCompile Include="CBlood.cpp" />
     <ClCompile Include="CBloodEmitor.cpp" />
+    <ClCompile Include="CBullet.cpp" />
+    <ClCompile Include="CBulletReflect.cpp" />
     <ClCompile Include="CButtonUI.cpp" />
     <ClCompile Include="CCameraMgr.cpp" />
     <ClCompile Include="CCursor.cpp" />
@@ -259,16 +284,23 @@
     <ClCompile Include="CGroundBreaker.cpp" />
     <ClCompile Include="CGrunt.cpp" />
     <ClCompile Include="CGruntFist.cpp" />
+    <ClCompile Include="CGunSparkLeft.cpp" />
+    <ClCompile Include="CGunSparkRight.cpp" />
     <ClCompile Include="CHitEffect.cpp" />
+    <ClCompile Include="CIronDoorLeft.cpp" />
+    <ClCompile Include="CIronDoorRight.cpp" />
     <ClCompile Include="CJumpCloud.cpp" />
     <ClCompile Include="CJumpCloudLeft.cpp" />
     <ClCompile Include="CJumpCloudRight.cpp" />
+    <ClCompile Include="CKnife.cpp" />
     <ClCompile Include="CLandCloud.cpp" />
     <ClCompile Include="CLaser.cpp" />
     <ClCompile Include="CLaserParticle.cpp" />
     <ClCompile Include="CLaserparticleEmitor.cpp" />
     <ClCompile Include="CLineCollider.cpp" />
     <ClCompile Include="CMap.cpp" />
+    <ClCompile Include="CMonsterPoolMgr.cpp" />
+    <ClCompile Include="CNeutralObjMgr.cpp" />
     <ClCompile Include="CNodeMgr.cpp" />
     <ClCompile Include="CNormalDoorLeft.cpp" />
     <ClCompile Include="CNormalDoorRight.cpp" />
@@ -276,10 +308,15 @@
     <ClCompile Include="CPanelUI.cpp" />
     <ClCompile Include="CParticle.cpp" />
     <ClCompile Include="CParticleEmitor.cpp" />
+    <ClCompile Include="CParticleMgr.cpp" />
     <ClCompile Include="CPomp.cpp" />
     <ClCompile Include="CPompStick.cpp" />
     <ClCompile Include="CRigidBody.cpp" />
+    <ClCompile Include="CScene_Stage2.cpp" />
     <ClCompile Include="CScene_Tool.cpp" />
+    <ClCompile Include="CSmoke.cpp" />
+    <ClCompile Include="CSmokeEmitor.cpp" />
+    <ClCompile Include="CSmokeValve.cpp" />
     <ClCompile Include="CStair.cpp" />
     <ClCompile Include="CStairCensor.cpp" />
     <ClCompile Include="CSword.cpp" />
@@ -291,6 +328,7 @@
     <ClCompile Include="CScene.cpp" />
     <ClCompile Include="CSceneMgr.cpp" />
     <ClCompile Include="CScene_Start.cpp" />
+    <ClCompile Include="CTable.cpp" />
     <ClCompile Include="CTexture.cpp" />
     <ClCompile Include="CTile.cpp" />
     <ClCompile Include="CTileUI.cpp" />
@@ -298,6 +336,9 @@
     <ClCompile Include="CUI.cpp" />
     <ClCompile Include="CUIMgr.cpp" />
     <ClCompile Include="CWall.cpp" />
+    <ClCompile Include="CWallCam.cpp" />
+    <ClCompile Include="CWallDoor.cpp" />
+    <ClCompile Include="CWall_CantClimb.cpp" />
     <ClCompile Include="KatanaZero.cpp" />
     <ClCompile Include="KeyMgr.cpp" />
     <ClCompile Include="CNode.cpp" />
@@ -305,6 +346,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PenMgr.cpp" />
     <ClCompile Include="CRunDustcloudEmitor.cpp" />
+    <ClCompile Include="ThrowingObj.cpp" />
     <ClCompile Include="TimeMgr.cpp" />
   </ItemGroup>
   <ItemGroup>

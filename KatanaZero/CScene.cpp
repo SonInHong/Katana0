@@ -2,6 +2,7 @@
 #include "CScene.h"
 #include "CObject.h"
 #include "CCameraMgr.h"
+#include "CMonster.h"
 
 CScene::CScene()
 	:m_arrObj{}
@@ -64,9 +65,23 @@ void CScene::Render(HDC _dc)
 
 	CCameraMgr::Create()->Render(_dc);
 
+	if (m_arrObj[(UINT)GROUP_TYPE::PLAYER].empty() == false)
+	{
+		CObject* pla = m_arrObj[(UINT)GROUP_TYPE::PLAYER][0];
+		if (pla)
+			pla->ReRender(_dc);
+
+	}
+
+	if (m_arrObj[(UINT)GROUP_TYPE::MONSTER].empty() == false)
+	{
+		for (int i = 0; i < m_arrObj[(UINT)GROUP_TYPE::MONSTER].size(); ++i)
+			m_arrObj[(UINT)GROUP_TYPE::MONSTER][i]->ReRender(_dc);
+		
+
+	}
 	
-	CObject* pla = m_arrObj[(UINT)GROUP_TYPE::PLAYER][0];
-	pla->ReRender(_dc);
+	
 
 
 		

@@ -19,14 +19,29 @@ void CLaserparticleEmitor::Initialize()
 	{
 		CLaserParticle* _particle = new CLaserParticle;
 		_particle->Initialize();
-		CEventMgr::Create()->Event_CreateObj(_particle, GROUP_TYPE::PARTICLE);
-
+		
 		m_Particles.push_back(_particle);
 	}
 }
 
+void CLaserparticleEmitor::Enter()
+{
+	for (int i = 0; i < m_PoolSize; ++i)
+	{
+		CEventMgr::Create()->Event_CreateObj(m_Particles[i], GROUP_TYPE::PARTICLE);
+
+	}
+}
+
+void CLaserparticleEmitor::Exit()
+{
+}
+
 void CLaserparticleEmitor::Update()
 {
+	if (!OnOff)
+		return;
+
 	if (Owner)
 		Pos = Owner->GetPos() + OffSet;
 

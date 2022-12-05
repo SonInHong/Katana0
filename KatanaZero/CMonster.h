@@ -16,6 +16,8 @@ public:
     ~CMonster();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
 
@@ -30,6 +32,8 @@ public:
 
     bool PlayerDetection();
 
+    bool CheckArchitectureCollision(doublepoint A, doublepoint B);
+
     friend CSword;
 
 protected:
@@ -38,9 +42,7 @@ protected:
     doublepoint PrevPos;
     bool PrevOnFloor;
     bool AttackOnAir;
-    long double AttackTimer;
-    bool AttackTimerSwitch;
-
+    
     //오더들
     Move_Order MoveOrder;
     Action_Order ActionOrder;
@@ -55,6 +57,8 @@ protected:
     double DetectAngle;
     doublepoint EyeOffset; //눈높이
     double DetectOthersDeathRange;
+    double DetectCoff;
+    double DetectOthersDeathCoff;
 
     //피격 관련 변수들
     double HurtAngle;
@@ -64,8 +68,6 @@ protected:
     //레이저 관련 변수
     bool LaserExist;
 
-    //블러드 이미터
-    CBloodEmitor* BloodEmitor;
 
     void MoveLeft();
     void MoveRight();
@@ -75,5 +77,12 @@ protected:
 
     std::vector<CTopFloor*> IgnoreTopFloorList;
     std::vector<CTopFloor*> RecogniseTopFloorList;
+
+    //공속 관련 변수
+    double ShotSpeed;
+    long double ShotTimer;
+
+    double AttackSpeed;
+    long double AttackTimer;
 };
 

@@ -4,6 +4,7 @@
 
 class CParticleEmitor;
 class CBloodEmitor;
+class CSmokeEmitor;
 
 class CParticle:public CObject
 {
@@ -12,11 +13,14 @@ public:
 	virtual ~CParticle();
 
 	virtual void Initialize();
+	virtual void Enter();
+	virtual void Exit();
 	virtual void Update();
 	virtual void Render(HDC _dc);
 
 	friend CParticleEmitor;
 	friend CBloodEmitor;
+	friend CSmokeEmitor;
 
 	bool operator < (CParticle b)
 	{
@@ -24,6 +28,7 @@ public:
 	}
 
 	virtual void Shoot(); // 막 발사됐을때 해야할 일들
+	bool& GetValid() { return Valid; }
 
 protected:
 	CTexture* Texture;  // 텍스쳐 이미지

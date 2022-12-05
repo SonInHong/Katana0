@@ -38,13 +38,23 @@ void CParticleEmitor::Initialize()
 	}
 }
 
+void CParticleEmitor::Enter()
+{
+	for (int i = 0; i < m_PoolSize; ++i)
+	{		
+		CEventMgr::Create()->Event_CreateObj(m_Particles[i], GROUP_TYPE::PARTICLE);
+	}
+}
+
+void CParticleEmitor::Exit()
+{
+}
+
 void CParticleEmitor::Update()
 {
 
-	if (KeyMgr::Create()->key(Key::M).pressed)
-	{
-		int a = 0;
-	}
+	if (!OnOff)
+		return;
 
 	
 
@@ -84,8 +94,7 @@ void CParticleEmitor::Update()
 			m_PoolSize++;
 		}
 
-		if (!OnOff)
-			return;
+		
 
 		if (bullet)
 		{
@@ -107,6 +116,8 @@ void CParticleEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 
@@ -164,6 +175,8 @@ void CParticleEmitor::Update()
 			m_TimeLimit = distrAtt(eng); // 타임리밋 조정
 			m_Timer = 0;
 			m_count++;
+
+			
 		}
 
 		

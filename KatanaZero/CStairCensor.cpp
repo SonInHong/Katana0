@@ -45,3 +45,11 @@ void CStairCensor::Render(HDC _dc)
 {
 	CObject::Render(_dc);
 }
+
+void CStairCensor::Enter()
+{
+}
+
+void CStairCensor::Exit()
+{
+}

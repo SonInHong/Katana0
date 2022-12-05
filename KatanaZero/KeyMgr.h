@@ -115,7 +115,7 @@ public:
 		return &p;
 	}
 
-	KeyInfo key(Key k)
+	KeyInfo& key(Key k)
 	{
 		return keyinfo[k];
 	}
@@ -137,6 +137,9 @@ public:
 
 		keyinfo[LEFTMOUSE].key_state = KeyState::NONE;
 		keyinfo[LEFTMOUSE].pressed = false;
+
+		keyinfo[RIGHTMOUSE].key_state = KeyState::NONE;
+		keyinfo[RIGHTMOUSE].pressed = false;
 	}
 
 	POINT GetMousePos() { return mousePos; }

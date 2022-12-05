@@ -5,7 +5,7 @@
 
 CDirtyWaterEmitor::CDirtyWaterEmitor()
 {
-	SetOption(doublepoint{ 2,2 }, doublepoint{ 90,180 }, doublepoint{ 10,50 }, doublepoint{ 2,2 }, doublepoint{ 0,0.05 }, doublepoint{ 0,0 }, doublepoint{ 0,0 }, 300);
+	SetOption(doublepoint{ 2,2 }, doublepoint{ 90,180 }, doublepoint{ 10,50 }, doublepoint{ 2,2 }, doublepoint{ 0,0.05 }, doublepoint{ 0,0 }, doublepoint{ 0,0 });
 
 	for (int i = 0; i < m_PoolSize; ++i)
 	{

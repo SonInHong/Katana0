@@ -22,5 +22,8 @@ void CDustcloud::Shoot()
 
 void CDustcloud::Render(HDC _dc)
 {
+	if (!Valid)
+		return;
+
 	CParticle::Render(_dc);
 }

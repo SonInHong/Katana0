@@ -32,6 +32,10 @@ public:
 		case PenColor::AQUA:
 			return AquaBrush;
 			break;
+
+		case PenColor::BLACK:
+			return BlackBrush;
+			break;
 		}
 
 		return 0;
@@ -56,6 +60,10 @@ public:
 		case PenColor::AQUA:
 			return RGB(0, 255, 255);
 			break;
+
+		case PenColor::BLACK:
+			return RGB(0, 0, 0);
+			break;
 		}
 
 		return 0;
@@ -68,5 +76,6 @@ private:
 	HBRUSH YellowBrush = 0;
 	HBRUSH MagentaBrush = 0;
 	HBRUSH AquaBrush = 0;
+	HBRUSH BlackBrush = 0;
 };
 

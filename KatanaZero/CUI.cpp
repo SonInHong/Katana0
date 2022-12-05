@@ -21,6 +21,14 @@ void CUI::Initialize()
 
 }
 
+void CUI::Enter()
+{
+}
+
+void CUI::Exit()
+{
+}
+
 void CUI::Update()
 {
 

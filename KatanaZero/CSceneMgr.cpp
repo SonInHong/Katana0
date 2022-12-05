@@ -2,6 +2,7 @@
 #include "CSceneMgr.h"
 #include "CScene_Start.h"
 #include "CScene_Tool.h"
+#include "CScene_Stage2.h"
 #include "CCore.h"
 #include "CTexture.h"
 #include "CResourceMgr.h"
@@ -21,8 +22,9 @@ void CSceneMgr::Initialize()
 {
 	m_arrScene[(UINT)SCENE_TYPE::START] = new CScene_Start;
 	m_arrScene[(UINT)SCENE_TYPE::TOOL] = new CScene_Tool;
+	m_arrScene[(UINT)SCENE_TYPE::STAGE_02] = new CScene_Stage2;
 
-	m_pCurScene = m_arrScene[(UINT)SCENE_TYPE::START];
+	m_pCurScene = m_arrScene[(UINT)SCENE_TYPE::STAGE_02];
 
 	
 }

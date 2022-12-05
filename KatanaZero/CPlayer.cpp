@@ -24,6 +24,7 @@
 #include "CBloodEmitor.h"
 #include "CEffectMgr.h"
 #include "CLaserparticleEmitor.h"
+#include "CParticleMgr.h"
 
 #define Right 1
 #define Left -1
@@ -49,6 +50,8 @@ CPlayer::CPlayer()
 	,StunTimer(StunTime)
 	, Stunned(false)
 	,MP(100)
+	,CantClimb(false)
+	,Item(nullptr)
 {
 	MainOrder = Main_Order::End;
 }
@@ -276,6 +279,7 @@ void CPlayer::Initialize()
 	PlayerSword->Owner = this;
 	PlayerSword->SetResize(doublepoint{ 1.5,1.5 });
 	PlayerSword->SetValid(false);
+	PlayerSword->Initialize();
 	CEventMgr::Create()->Event_CreateObj(PlayerSword, GROUP_TYPE::PLAYER_PROJECTILE);
 
 
@@ -362,9 +366,20 @@ void CPlayer::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->FindAnimation(L"SlashLeft10")->m_CompleteEvent = std::bind(&CAnimator::Dont_Play_Anything, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1]));
 
 
-	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][1])->StartPlaying(L"SlashRight-20");
-
 	CAnimal::Initialize();
+}
+
+void CPlayer::Enter()
+{
+	CAnimal::Enter();
+
+	RollDustcloud->Enter();
+	RunDustcloud->Enter();
+	WallDustcloud->Enter();
+}
+
+void CPlayer::Exit()
+{
 }
 
 void CPlayer::GetInput()
@@ -452,9 +467,25 @@ void CPlayer::GetInput()
 		PlayerDead = true;
 		burn = true;
 
+
 		SetBloodEmitor(false);
-		if(lasoremitorcount<1)
+		if (lasoremitorcount < 1)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				if (CParticleMgr::Create()->LaserParticleEmitor[i]->GetOnOff() == false)
+				{
+					LaserparticleEmitor = CParticleMgr::Create()->LaserParticleEmitor[i];
+					LaserparticleEmitor->SetOwner(this);
+					LaserparticleEmitor->SetOffset(doublepoint{ 0,-20 });
+					LaserparticleEmitor->SetOnOff(false);
+					break;
+				}
+			}
+
 			SetLaserParticleOption(doublepoint{ 1,1 }, doublepoint{ 190,350 }, doublepoint{ 70,500 }, doublepoint{ 0.3,1 }, doublepoint{ 0.001,0.01 }, doublepoint{ -10,10 }, doublepoint{ 0,0 });
+		}
+			
 
 		lasoremitorcount++;
 
@@ -535,7 +566,7 @@ void CPlayer::GetInput()
 				//착지 이펙트 필요
 
 
-				CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+				CEffectMgr::Create()->LandCloud.Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 				
 			}
 
@@ -554,7 +585,7 @@ void CPlayer::GetInput()
 				WallGrab = 0;
 
 				//착지 이펙트 필요
-				CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+				CEffectMgr::Create()->LandCloud.Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 
 			}
 		}
@@ -700,7 +731,7 @@ void CPlayer::GetInput()
 
 				else
 				{
-					if (Animator0->GetCurAnimation()->GetName() != L"WallGrabLeft")
+					if (Animator0->GetCurAnimation()->GetName() != L"WallGrabLeft" && CantClimb == false)
 					{
 						dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"WallGrabLeft");
 						WallGrab = 1;
@@ -785,7 +816,7 @@ void CPlayer::GetInput()
 
 				else
 				{
-					if (Animator0->GetCurAnimation()->GetName() != L"WallGrabLeft")
+					if (Animator0->GetCurAnimation()->GetName() != L"WallGrabLeft" && CantClimb == false)
 					{
 						dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"WallGrabRight");
 						WallGrab = -1;
@@ -930,7 +961,7 @@ void CPlayer::GetInput()
 			OnStair = 0;
 
 			//점프 이펙트 필요
-			CEffectMgr::Create()->JumpCloud->Play(Pos + doublepoint{ 0,0 }, Resize* scaleA * 1.3);
+			CEffectMgr::Create()->JumpCloud.Play(Pos + doublepoint{ 0,0 }, Resize* scaleA * 1.3);
 
 
 		}
@@ -1000,6 +1031,25 @@ void CPlayer::GetInput()
 
 	}
 
+	if (KeyMgr::Create()->key(RIGHTMOUSE).key_state == KeyState::TAP)
+	{
+		//마우스 커서 포지션 받아와서
+		doublepoint mousepos = CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::CURSOR)[0]->GetPos();
+
+		//실제좌표 계산
+		mousepos = CCameraMgr::Create()->RealCoordinate(mousepos);
+
+		//캐릭터 포지션이랑 비교해서 어택앵글 계산
+		AttackAngle = atan2(mousepos.y - Pos.y, mousepos.x - Pos.x);
+
+		doublepoint Vel;
+		Vel.x = 2000 * cos(AttackAngle);
+		Vel.y = 2000 * sin(AttackAngle);
+
+		if (Item)
+			Item->Throw(Pos, Vel);
+	}
+
 	if (OnGround == false && OnStair == 0 && WallGrab == 0)
 	{
 		if (Animator0->GetCurAnimation()->GetName() != L"JumpRight"
@@ -1042,7 +1092,7 @@ void CPlayer::GetInput()
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+			CEffectMgr::Create()->LandCloud.Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 
 			
 		}
@@ -1060,7 +1110,7 @@ void CPlayer::GetInput()
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipRight");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				CEffectMgr::Create()->JumpCloudRight->Play(Pos + doublepoint{ 20,0 }, Resize* scaleA * 1.3);
+				CEffectMgr::Create()->JumpCloudRight.Play(Pos + doublepoint{ 20,0 }, Resize* scaleA * 1.3);
 				
 			}
 
@@ -1093,7 +1143,7 @@ TimeMgr::Create()->EndStopWatch();
 			WallGrab = 0;
 
 			//착지 이펙트 필요
-			CEffectMgr::Create()->LandCloud->Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
+			CEffectMgr::Create()->LandCloud.Play(Pos + doublepoint{ 0,25 * scaleA }, Resize* scaleA * 1.3);
 
 		}
 
@@ -1110,7 +1160,7 @@ TimeMgr::Create()->EndStopWatch();
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Play(L"FlipLeft");
 				dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->Reset();
 
-				CEffectMgr::Create()->JumpCloudLeft->Play(Pos + doublepoint{ -20,0 }, Resize* scaleA * 1.3);
+				CEffectMgr::Create()->JumpCloudLeft.Play(Pos + doublepoint{ -20,0 }, Resize* scaleA * 1.3);
 				
 			}
 
@@ -1298,7 +1348,14 @@ void CPlayer::Update()
 	}
 
 
+	// 오를수 있는 벽 판정 초기화
+	CantClimb = false;
+
 	CAnimal::Update();
+
+
+	
+		
 }
 
 void CPlayer::Render(HDC _dc)
@@ -1467,7 +1524,7 @@ void CPlayer::BreakGround()
 	CGroundBreaker* m = new CGroundBreaker;
 	m->Owner = this;
 	m->SetResize(doublepoint{ 1.5,1.5 });
-	//m->Initialize();
+	m->Initialize();
 
 	CEventMgr::Create()->Event_CreateObj(m, GROUP_TYPE::PLAYER_PROJECTILE);
 }
@@ -1481,6 +1538,7 @@ void CPlayer::SmashDoor()
 		CDoorBreaker* DB = new CDoorBreaker;
 		DB->Owner = this;
 		DB->SetDir(LookDirection);
+		DB->Initialize();
 		CEventMgr::Create()->Event_CreateObj(DB, GROUP_TYPE::PLAYER_PROJECTILE);
 
 		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().x = -LookDirection * 300;
@@ -1494,6 +1552,7 @@ void CPlayer::SmashDoor()
 		CDoorBreaker* DB = new CDoorBreaker;
 		DB->Owner = this;
 		DB->SetDir(LookDirection);
+		DB->Initialize();
 		CEventMgr::Create()->Event_CreateObj(DB, GROUP_TYPE::PLAYER_PROJECTILE);
 
 		dynamic_cast<CRigidBody*>(m_Component[(UINT)COMPONENT_TYPE::RIGIDBODY][0])->GetVelocity().x = -LookDirection * 300;

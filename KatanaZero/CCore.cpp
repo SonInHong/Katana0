@@ -13,6 +13,9 @@
 #include "PenMgr.h"
 #include "CEffectMgr.h"
 #include "CScene.h"
+#include "CNeutralObjMgr.h"
+#include "CMonsterPoolMgr.h"
+#include "CParticleMgr.h"
 
 CCore::CCore()
 	:A_WindowData{}
@@ -50,6 +53,7 @@ void CCore::Initialize(WindowData windowdata, WindowData _ToolwindowData)
 	HBITMAP used = (HBITMAP)SelectObject(mem_dc, mem_bitmap);
 	DeleteObject(used);
 
+	
 	PenMgr::Create()->Initialize();
 	TimeMgr::Create()->Initialize();
 	PathMgr::Create()->Initialize();
@@ -58,9 +62,13 @@ void CCore::Initialize(WindowData windowdata, WindowData _ToolwindowData)
 	CColliderMgr::Create()->Initialize();
 	CCameraMgr::Create()->Initialize();
 	CEffectMgr::Create()->Initialize();
+	CNeutralObjMgr::Create()->Initialize();
+	CMonsterPoolMgr::Create()->Initialize();
+	CParticleMgr::Create()->Initialize();
 
 	CSceneMgr::Create()->GetCurScene()->Enter();
 
+	
 }
 
 void CCore::Update()

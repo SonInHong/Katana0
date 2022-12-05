@@ -3,6 +3,8 @@
 #include "CResourceMgr.h"
 #include "KeyMgr.h"
 #include "CCore.h"
+#include "CCameraMgr.h"
+#include "TimeMgr.h"
 
 CCursor::CCursor()
 {
@@ -21,6 +23,14 @@ void CCursor::Initialize()
 	
 }
 
+void CCursor::Enter()
+{
+}
+
+void CCursor::Exit()
+{
+}
+
 void CCursor::Update()
 {
 	POINT mousepos = KeyMgr::Create()->GetMousePos();
@@ -35,6 +45,17 @@ void CCursor::Render(HDC _dc)
 {
 	TransparentBlt(_dc, Pos.x - Scale.x / 2, Pos.y - Scale.y / 2, Scale.x, Scale.y
 		, Texture->GetDC(), 0,0, Texture->GetWidth(), Texture->GetHeight(), RGB(255, 255, 255));
+
+
+	doublepoint pos = CCameraMgr::Create()->RealCoordinate(Pos);
+
+	wchar_t _Buffer[250];
+	swprintf_s(_Buffer, L"Pos : (%f, %f) , dt: %f",
+		pos.x, pos.y, TimeMgr::Create()->realdt());
+
+	std::wstring str = {};
+	str += _Buffer;
+	SetWindowText(CCore::Create()->GetWindowData().hwnd, str.c_str());
 }
 
 

@@ -15,6 +15,14 @@ CTile::~CTile()
 {
 }
 
+void CTile::Enter()
+{
+}
+
+void CTile::Exit()
+{
+}
+
 void CTile::Update()
 {
 }

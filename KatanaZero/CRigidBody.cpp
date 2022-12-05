@@ -126,7 +126,7 @@ void CRigidBody::Update()
 			m_Velocity.x = m_Velocity.x / abs(m_Velocity.x) * m_MaxXFallspeed;
 	}
 	
-	if (abs(m_Velocity.x) < 3)
+	if (abs(m_Velocity.x) < 10)
 		m_Velocity.x = 0;
 
 	
@@ -201,8 +201,8 @@ void CRigidBody::Update()
 	std::wstring str = {};
 	str += _Buffer;
 
-	if(dynamic_cast<CPlayer*>(Owner) != nullptr)
-		SetWindowText(CCore::Create()->GetWindowData().hwnd, str.c_str());
+	//if(dynamic_cast<CPlayer*>(Owner) != nullptr)
+		//SetWindowText(CCore::Create()->GetWindowData().hwnd, str.c_str());
 
 	//»˚ √ ±‚»≠
 	m_Force = doublepoint{ 0,0 };

@@ -2,17 +2,26 @@
 #include "CHitEffect.h"
 #include "TimeMgr.h"
 #include "CCameraMgr.h"
+#include "CResourceMgr.h"
 
 CHitEffect::CHitEffect()
 	:Valid(false)
 	,Texture(nullptr)
 {
 	//텍스쳐 로딩
-	Texture = new CTexture;
-	Texture->Load(L"Effect\\HitEffect\\0.bmp");
+	Texture = CResourceMgr::Create()->Load<CTexture>(L"Effect\\HitEffect\\0.bmp");
+	
 }
 
 CHitEffect::~CHitEffect()
+{
+}
+
+void CHitEffect::Enter()
+{
+}
+
+void CHitEffect::Exit()
 {
 }
 
@@ -52,7 +61,7 @@ void CHitEffect::Render(HDC _dc)
 	{
 
 		doublepoint pos = CCameraMgr::Create()->CameraCoordinate(Pos - vector * 4* i);
-		AlphaBlend(_dc, pos.x - 5, pos.y - 5, scaleA * 10, scaleA * 10, Texture->GetDC(), t-20/Length*i, 0, 5, 5, func);
+		AlphaBlend(_dc, pos.x - 5, pos.y - 5, scaleA * 10, scaleA * 10, Texture->GetDC(), t-80/Length*i, 0, 5, 5, func);
 		
 	}
 

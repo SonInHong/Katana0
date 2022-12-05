@@ -7,6 +7,7 @@
 #include "CMonster.h"
 #include "CSword.h"
 #include "CCameraMgr.h"
+#include "CBullet.h"
 
 CGangsterGun::CGangsterGun()
 	:Owner(nullptr)
@@ -16,7 +17,7 @@ CGangsterGun::CGangsterGun()
 	, TimeLimit(0.3)
 	, Valid(false)
 {
-	CreateCollider();
+	
 }
 
 CGangsterGun::~CGangsterGun()
@@ -30,12 +31,22 @@ void CGangsterGun::Initialize()
 	Scale.x = scaleA * 30;
 	Scale.y = scaleA * 30;
 
-	Speed = scaleA * 500;
+	Speed = scaleA * 700;
+
+	CreateCollider();
+}
+
+void CGangsterGun::Enter()
+{
+}
+
+void CGangsterGun::Exit()
+{
 }
 
 void CGangsterGun::Update()
 {
-	if (TimeLimit < 0.25)
+	if (TimeLimit < 0.3)
 		Valid = true;
 
 	if (TimeLimit < 0)
@@ -66,6 +77,35 @@ bool CGangsterGun::Collide(CObject* other)
 	if (!Valid)
 		return false;
 
+	CSword* s = dynamic_cast<CSword*>(other);
+	if (s)
+	{
+		if (s->GetValid())
+		{
+			CPlayer* pl = s->GetOwner();
+			if (pl)
+			{
+				double x = ((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().x;
+
+				pl->StunPlayer();
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().y = -400;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().x = -x;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnGround() = false;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnStair() = 0;
+
+				s->GetValid() = false;
+			}
+
+			Valid = false;
+			
+			CCameraMgr::Create()->SetCameraEffect(CameraEffect::SHAKE);
+
+			return true;
+
+		}
+	}
+
+
 	CPlayer* p = dynamic_cast<CPlayer*>(other);
 	if (p)
 	{
@@ -88,6 +128,34 @@ bool CGangsterGun::Colliding(CObject* other)
 {
 	if (!Valid)
 		return false;
+
+	CSword* s = dynamic_cast<CSword*>(other);
+	if (s)
+	{
+		if (s->GetValid())
+		{
+			CPlayer* pl = s->GetOwner();
+			if (pl)
+			{
+				double x = ((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().x;
+
+				pl->StunPlayer();
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().y = -400;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetVelocity().x = -x;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnGround() = false;
+				((CRigidBody*)pl->GetComponent(COMPONENT_TYPE::RIGIDBODY)[0])->GetOnStair() = 0;
+
+				s->GetValid() = false;
+			}
+
+			Valid = false;
+
+			CCameraMgr::Create()->SetCameraEffect(CameraEffect::SHAKE);
+
+			return true;
+
+		}
+	}
 
 	CPlayer* p = dynamic_cast<CPlayer*>(other);
 	if (p)

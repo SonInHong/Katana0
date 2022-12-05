@@ -23,6 +23,14 @@ void CFloor::Initialize()
 	CreateCollider();
 }
 
+void CFloor::Enter()
+{
+}
+
+void CFloor::Exit()
+{
+}
+
 bool CFloor::Collide(CObject* other)
 {
 

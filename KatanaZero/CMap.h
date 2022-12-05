@@ -10,9 +10,11 @@ public:
     ~CMap();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
-    void Load(const std::wstring& _Path);
+    void Load(const std::wstring& _Path , double sizeup);
     void Copy(double d);
 
 private:

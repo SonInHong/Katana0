@@ -7,13 +7,14 @@
 #include "CPlayer.h"
 #include "CCameraMgr.h"
 #include "KeyMgr.h"
+#include "CResourceMgr.h"
 
 CLaser::CLaser()
     :Texture(nullptr)
     ,OnOff(true)
     , CollisionOn(false)
 {
-    CreateCollider();
+    
     CreateAnimator();
 }
 
@@ -23,14 +24,23 @@ CLaser::~CLaser()
 
 void CLaser::Initialize()
 {
+    CreateCollider();
+
     dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Laser\\NoCollision", L"LaserNoCollision", doublepoint{ 0,0 }, doublepoint{ 1,Scale.y*Resize.y/AnimationScaling.y }, 4, 0.03, true);
     dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Laser\\Collision", L"LaserCollision", doublepoint{ 0,0 }, doublepoint{ 2,Scale.y * Resize.y / AnimationScaling.y }, 4, 0.03, false);
-    Texture = new CTexture;
-    Texture->Load(L"Laser\\spr_ceiling_laser_on\\0.bmp");
-
+    Texture = CResourceMgr::Create()->Load<CTexture>(L"Laser\\spr_ceiling_laser_on\\0.bmp");
+   
     dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
         ->FindAnimation(L"LaserCollision")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"LaserNoCollision");
 
+}
+
+void CLaser::Enter()
+{
+}
+
+void CLaser::Exit()
+{
 }
 
 void CLaser::Update()

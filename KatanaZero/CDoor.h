@@ -1,8 +1,9 @@
 #pragma once
 #include "CObject.h"
+#include "CArchitecture.h"
 #include <map>
 class CDoor :
-    public CObject
+    public CArchitecture
 {
 public:
     CDoor();
@@ -12,6 +13,8 @@ public:
 
     virtual void Initialize();
     virtual void Update();
+    virtual void Enter();
+    virtual void Exit();
 
     virtual bool Collide(CObject* other);
     virtual bool Colliding(CObject* other);

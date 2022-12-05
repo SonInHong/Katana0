@@ -41,8 +41,6 @@ void CCollider::Update()
 	AbsolutePos.x = Owner->GetPos().x + OffSet.x;
 	AbsolutePos.y = Owner->GetPos().y + OffSet.y;
 
-	Scale.x = Owner->GetResize().x * Owner->GetScale().x;
-	Scale.y = Owner->GetResize().y * Owner->GetScale().y;
 }
 
 void CCollider::Render(HDC _dc)

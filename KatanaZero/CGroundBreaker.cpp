@@ -46,6 +46,14 @@ void CGroundBreaker::Initialize()
 
 }
 
+void CGroundBreaker::Enter()
+{
+}
+
+void CGroundBreaker::Exit()
+{
+}
+
 void CGroundBreaker::Update()
 {
 	OffSet.y += Speed * TimeMgr::Create()->dt();

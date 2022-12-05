@@ -13,15 +13,25 @@
 #include "TimeMgr.h"
 #include "CEventMgr.h"
 #include "CGangsterGun.h"
+#include "CBullet.h"
+#include "CNeutralObjMgr.h"
+#include "CEffectMgr.h"
+#include "CCollider.h"
+
+#define ShotTerm 1.5
+#define AttackTerm 0.5
 
 CGangster::CGangster()
-	:ShotSpeed(0.5)
-	,ShotTimer(0)
 {
 	RoamingDistance = 300;
 	DetectAngle = 30;
 	DetectRange = 600;
 	EyeOffset = doublepoint{ 0,-20 };
+
+	ShotSpeed = ShotTerm;
+	ShotTimer = ShotTerm;
+	AttackSpeed = AttackTerm;
+	AttackTimer = AttackTerm;
 }
 
 CGangster::~CGangster()
@@ -52,14 +62,14 @@ void CGangster::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtfly\\right", L"GangsterHurtflyRight", doublepoint{ 0,0 }, doublepoint{ 38,34 }, 2, 0.07, false, doublepoint{ 0,-10 });
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtfly\\left", L"GangsterHurtflyLeft", doublepoint{ 0,0 }, doublepoint{ 38,34 }, 2, 0.07, false, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtground\\right", L"GangsterHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 44,34 }, 14, 0.1, false, doublepoint{ 0,-10 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtground\\left", L"GangsterHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 44,34 }, 14, 0.1, false, doublepoint{ 0,-10 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtground\\right", L"GangsterHurtgroundRight", doublepoint{ 0,0 }, doublepoint{ 44,34 }, 14, 0.1, false, doublepoint{ 0,0 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterhurtground\\left", L"GangsterHurtgroundLeft", doublepoint{ 0,0 }, doublepoint{ 44,34 }, 14, 0.1, false, doublepoint{ 0,0 });
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterfall\\right", L"GangsterFallRight", doublepoint{ 0,0 }, doublepoint{ 42,41 }, 12, 0.04, true, doublepoint{ 0,-10 });
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangsterfall\\left", L"GangsterFallLeft", doublepoint{ 0,0 }, doublepoint{ 42,41 }, 12, 0.04, true, doublepoint{ 0,-10 });
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangster_shot\\right", L"GangsterShotRight", doublepoint{ 0,0 }, doublepoint{ 42,50 }, 5, 0.07, false, doublepoint{ 15,-20 });
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangster_shot\\left", L"GangsterShotLeft", doublepoint{ 0,0 }, doublepoint{ 42,50 }, 5, 0.07, false, doublepoint{ -15,-20 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangster_shot\\right", L"GangsterShotRight", doublepoint{ 0,0 }, doublepoint{ 42,50 }, 5, 0.07, false, doublepoint{ 15,-25 });
+	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->CreateSpriteAndAnimation(L"Enemy\\Gangster\\spr_gangster_shot\\left", L"GangsterShotLeft", doublepoint{ 0,0 }, doublepoint{ 42,50 }, 5, 0.07, false, doublepoint{ -15,-25 });
 
 	
 	
@@ -86,11 +96,11 @@ void CGangster::Initialize()
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GangsterTurnLeft")->m_CompleteEvent = std::bind(&CAnimator::StartPlaying, dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0]), L"GangsterIdleLeft");
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GangsterAttackRight")->m_StartEvent = std::bind(&CGangster::SlashFist, this, Right);  // 공격
+	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		//->FindAnimation(L"GangsterAttackRight")->m_StartEvent = std::bind(&CGangster::SlashFist, this, Right);  // 공격
 
-	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
-		->FindAnimation(L"GangsterAttackLeft")->m_StartEvent = std::bind(&CGangster::SlashFist, this, Left); // 공격
+	//dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
+		//->FindAnimation(L"GangsterAttackLeft")->m_StartEvent = std::bind(&CGangster::SlashFist, this, Left); // 공격
 
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])
 		->FindAnimation(L"GangsterAttackRight")->m_CompleteEvent = std::bind(&CGangster::CheckAttackStop, this);  // 공격이 끝날때마다 공격상태 탈출조건 확인
@@ -149,8 +159,19 @@ void CGangster::Initialize()
 		->FindAnimation(L"GangsterHurtflyLeft")->AfterImageOn(0.2, PenColor::MAGENTA);
 
 	//=====================================================================================================================
+	
+}
+
+void CGangster::Enter()
+{
+	CMonster::Enter();
+
 	dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterIdleRight");
 	LookDirection = Right;
+}
+
+void CGangster::Exit()
+{
 }
 
 void CGangster::Update()
@@ -436,13 +457,21 @@ void CGangster::Update()
 	
 
 	//사격 수행 조건
-	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 700 && diff.x * LookDirection >= 0)
+	if (MainOrder == Main_Order::PlayerDetected && diff.Norm() < 700 && diff.x * LookDirection >= 0 && CheckArchitectureCollision(Pos, player->GetPos()) == false)
 	{
 		if (LookDirection == Right)
+		{
 			MainOrder = Main_Order::ShotRight;
+			ActionOrder = Action_Order::ShotRight;
+		}
+			
 
 		else if (LookDirection == Left)
+		{
 			MainOrder = Main_Order::ShotLeft;
+			ActionOrder = Action_Order::ShotLeft;
+		}
+			
 	}
 		
 	//=======================================================================================================================================
@@ -638,40 +667,80 @@ void CGangster::Update()
 	break;
 
 	case Action_Order::AttackLeft:
-	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterAttackLeft");
+	{				
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterAttackLeft");
+			SlashFist(Left);
+			AttackTimer = 0;
 
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GangsterAttackLeft")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterIdleLeft");
+		}
 	}
 	break;
 
 	case Action_Order::AttackRight:
 	{
-		dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterAttackRight");
+		
+		
+		if (AttackTimer > AttackSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterAttackRight");
+			SlashFist(Right);
+			AttackTimer = 0;
+
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GangsterAttackRight")
+		{
+			CheckAttackStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterIdleRight");
+		}
 
 	}
 	break;
 
 	case Action_Order::ShotLeft:
 	{	
-		if(ShotTimer == 0)
-			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterShotLeft");
-
-		ShotTimer += TimeMgr::Create()->dt();
 		if (ShotTimer > ShotSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterShotLeft");
+			ShootGun();
 			ShotTimer = 0;
 
+			CEffectMgr::Create()->GunSparkLeft.Play(Pos + doublepoint{ -110,-25 }, doublepoint{ 2,2 });
+		}
+		
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GangsterShotLeft")
+		{
+			CheckShotStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterIdleLeft");
+		}
 	}
 	break;
 
 	case Action_Order::ShotRight:
 	{
-		if (ShotTimer == 0)
-			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterShotRight");
-
-		ShotTimer += TimeMgr::Create()->dt();
 		if (ShotTimer > ShotSpeed)
+		{
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterShotRight");
+			ShootGun();
 			ShotTimer = 0;
 
+			CEffectMgr::Create()->GunSparkRight.Play(Pos + doublepoint{ 110,-25 },doublepoint{2,2});
+		}
+
+		else if (dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->GetCurAnimation()->GetName() != L"GangsterShotRight")
+		{
+			CheckShotStop();
+			dynamic_cast<CAnimator*>(m_Component[(UINT)COMPONENT_TYPE::ANIMATOR][0])->StartPlaying(L"GangsterIdleRight");
+		}
+			
 	}
 	break;
 
@@ -742,6 +811,8 @@ void CGangster::Update()
 
 	}
 
+	ShotTimer += TimeMgr::Create()->dt();
+	AttackTimer += TimeMgr::Create()->dt();
 }
 
 void CGangster::Render(HDC _dc)
@@ -761,8 +832,18 @@ void CGangster::SlashFist(int dir)
 	CEventMgr::Create()->Event_CreateObj(fist, GROUP_TYPE::MONSTER_PROJECTILE);
 }
 
+#define bulletVelocity 1500
+
 void CGangster::ShootGun()
 {
+	CPlayer* player = dynamic_cast<CPlayer*>(CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::PLAYER)[0]);
+
+	doublepoint vel = (dynamic_cast<CCollider*>(player->GetComponent(COMPONENT_TYPE::COLLIDER)[0])->GetAbsPos() - (Pos + doublepoint{ (double)LookDirection * 60,-15 })).Normalize() * bulletVelocity;
+
+	CNeutralObjMgr::Create()->ShootBullet(Pos + doublepoint{(double)LookDirection*60,-15}, vel, true);
+
+	
+
 }
 
 void CGangster::CheckAttackStop()
@@ -779,8 +860,12 @@ void CGangster::CheckShotStop()
 	CPlayer* player = dynamic_cast<CPlayer*>(CSceneMgr::Create()->GetCurScene()->GetGroupObject(GROUP_TYPE::PLAYER)[0]);
 	doublepoint diff = (player->GetPos() - Pos);
 
-	if (diff.Norm() > 700 || diff.x * LookDirection < 0)
+	if (diff.Norm() > 700 || diff.x * LookDirection < 0 || CheckArchitectureCollision(Pos, player->GetPos()) == true)
+	{
+	
 		MainOrder = Main_Order::PlayerDetected;
+	}
+		
 
 	if (diff.Norm() < 150 && diff.x * LookDirection >= 0)
 	{
@@ -789,6 +874,9 @@ void CGangster::CheckShotStop()
 
 		else if (LookDirection == Left)
 			MainOrder = Main_Order::AttackLeft;
+
 	}
+
+	
 
 }

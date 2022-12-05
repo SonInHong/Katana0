@@ -142,7 +142,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     g_windowdate.clear(); //메인 윈도우 생성
     g_windowdate.height = 1080;
-    g_windowdate.width = 1920;
+    g_windowdate.width = 1900;
 
 
     g_windowdate.hwnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,

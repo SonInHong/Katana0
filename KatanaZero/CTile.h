@@ -8,6 +8,8 @@ public:
 	CTile();
 	virtual ~CTile();
 
+	virtual void Enter();
+	virtual void Exit();
 	virtual void Update();
 	virtual void Render(HDC _dc);
 	virtual void Save(FILE* file);

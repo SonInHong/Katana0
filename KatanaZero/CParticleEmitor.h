@@ -10,16 +10,12 @@ public:
     CParticleEmitor();
     ~CParticleEmitor();
 
-   
-
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
 
-    void SetOption(doublepoint resize,  doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange, int poolsize)
-    {
-        m_AngleRange = anglerange; m_VelocityRange = velocityrange; m_DurationRange = durationrange; m_AttackSpeedRange = attackspeedrange; m_PoolSize = poolsize; m_XOffSetRange = XoffRange; 
-        m_YOffSetRange = YoffRange; Resize = resize; m_count = 0; m_Maxcount = 10000;
-    }
+   
 
     void SetOption(doublepoint resize, doublepoint anglerange, doublepoint velocityrange, doublepoint durationrange, doublepoint attackspeedrange, doublepoint XoffRange, doublepoint YoffRange)
     {
@@ -34,6 +30,7 @@ public:
     }
 
     void SetOnOff(bool b) { OnOff = b; m_count = 0; }
+    bool& GetOnOff() { return OnOff; }
 
 protected:
     std::vector<CParticle*> m_Particles;

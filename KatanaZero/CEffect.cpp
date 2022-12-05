@@ -25,6 +25,14 @@ void CEffect::Pause()
 	Valid = false;
 }
 
+void CEffect::Enter()
+{
+}
+
+void CEffect::Exit()
+{
+}
+
 void CEffect::Render(HDC _dc)
 {
 	if (Valid)

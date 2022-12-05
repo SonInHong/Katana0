@@ -8,6 +8,8 @@ public:
     ~CGangster();
     
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
 
@@ -20,5 +22,8 @@ public:
 private:
     double ShotSpeed;
     double ShotTimer;
+
+    double AttackSpeed;
+    double AttackTimer;
 };
 

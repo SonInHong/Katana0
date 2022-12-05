@@ -9,6 +9,9 @@ public:
     CHitEffect();
     ~CHitEffect();
 
+    virtual void Enter();
+    virtual void Exit();
+
     virtual void Update();
     virtual void Render(HDC _dc);
     void Shoot(doublepoint from, doublepoint To , double velocity, double Length);

@@ -8,6 +8,8 @@ public:
     ~CPomp();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
 

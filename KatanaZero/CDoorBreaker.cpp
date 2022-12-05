@@ -18,13 +18,20 @@ CDoorBreaker::~CDoorBreaker()
 }
 
 void CDoorBreaker::Initialize()
-{
-	CreateCollider();
-
+{	
 	Pos.x = Owner->GetPos().x + OffSet.x;
 	Pos.y = Owner->GetPos().y + OffSet.y;
 	Scale.x = scaleA * 30;
 	Scale.y = scaleA * 30;
+	CreateCollider();
+}
+
+void CDoorBreaker::Enter()
+{
+}
+
+void CDoorBreaker::Exit()
+{
 }
 
 void CDoorBreaker::Update()

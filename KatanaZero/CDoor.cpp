@@ -12,7 +12,7 @@ CDoor::CDoor()
 	:m_CollideDir{}
 	,m_Open(false)
 {
-    CreateCollider();
+   
 	CreateAnimator();
 	AnimationScaling.x = 2;
 	AnimationScaling.y = 2;
@@ -26,11 +26,20 @@ CDoor::~CDoor()
 
 void CDoor::Initialize()
 {
+	CreateCollider();
 }
 
 void CDoor::Update()
 {
 	
+}
+
+void CDoor::Enter()
+{
+}
+
+void CDoor::Exit()
+{
 }
 
 bool CDoor::Collide(CObject* other)
@@ -191,7 +200,7 @@ bool CDoor::Colliding(CObject* other)
 
 	return true;
 }
-
+ 
 bool CDoor::CollideEscape(CObject* other)
 {
 	if (m_Open)

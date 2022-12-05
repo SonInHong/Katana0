@@ -16,7 +16,7 @@ CGruntFist::CGruntFist()
 	, TimeLimit(0.5)
 	, Valid(false)
 {
-	CreateCollider();
+	
 }
 
 CGruntFist::~CGruntFist()
@@ -32,7 +32,15 @@ void CGruntFist::Initialize()
 
 	Speed = scaleA * 500;
 
-	
+	CreateCollider();
+}
+
+void CGruntFist::Enter()
+{
+}
+
+void CGruntFist::Exit()
+{
 }
 
 void CGruntFist::Update()

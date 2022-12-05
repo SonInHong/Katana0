@@ -13,5 +13,8 @@ public:
     virtual bool DontCollide(CObject* other);
 
     virtual void Render(HDC _dc);
+
+    virtual void Enter();
+    virtual void Exit();
 };
 

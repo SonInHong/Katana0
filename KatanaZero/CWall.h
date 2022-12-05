@@ -1,15 +1,18 @@
 #pragma once
 #include "CObject.h"
+#include "CArchitecture.h"
 #include <map>
 
 class CWall :
-    public CObject
+    public CArchitecture
 {
 public:
     CWall();
     virtual ~CWall();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual bool Collide(CObject* other);
     virtual bool Colliding(CObject* other);
     virtual bool CollideEscape(CObject* other);

@@ -42,6 +42,10 @@ public:
 		case PenColor::AQUA:
 			return AquaDC;
 			break;
+
+		case PenColor::BLACK:
+			return blackDC;
+			break;
 		}
 
 		return 0;

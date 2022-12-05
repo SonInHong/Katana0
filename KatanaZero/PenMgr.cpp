@@ -17,4 +17,5 @@ void PenMgr::Initialize()
 	YellowBrush = CreateSolidBrush(RGB(255, 212, 0));
 	MagentaBrush = CreateSolidBrush(RGB(255, 0, 255));
 	AquaBrush = CreateSolidBrush(RGB(0, 255, 255));
+	BlackBrush = CreateSolidBrush(RGB(0, 0, 0));
 }

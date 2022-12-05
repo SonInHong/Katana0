@@ -4,7 +4,7 @@
 #include "CTexture.h"
 #include "CJumpCloudLeft.h"
 #include "CJumpCloudRight.h"
-
+#include "ThrowingObj.h"
 
 class CFloor;
 class CDustcloudEmitor;
@@ -25,6 +25,8 @@ public:
     void ManageEffector();
 
     virtual void Initialize();
+    virtual void Enter();
+    virtual void Exit();
     virtual void Update();
     virtual void Render(HDC _dc);
 
@@ -40,8 +42,15 @@ public:
     int GetRoll() { return Rolling; }
     bool& GetUnbeatable() { return Unbeatable; }
     void StunPlayer() { Stunned = true; }
+    void SetCantClimb(bool b) { CantClimb = b; }
+    bool& GetHiding() { return Hiding; }
+    void SetHiding(bool b) { Hiding = b; }
 
     CSword* GetSword() { return PlayerSword; }
+    ThrowingObj* GetItem() { return Item; }
+    void SetItem(ThrowingObj* p) { Item = p; }
+
+    
 
 private:
     CTexture* Texture;
@@ -57,14 +66,18 @@ private:
     bool PlayerDead;
     double HurtAngle;
     int Rolling;
+    bool CantClimb;
+   
 
     bool Unbeatable;
     double StunTimer;
     bool Stunned;
+   
 
     CSword* PlayerSword;
 
     double MP;
+    ThrowingObj* Item;
     
     void SlowOn();
     void SlowOff();
